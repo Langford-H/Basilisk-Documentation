@@ -1,0 +1,6 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8}]
+  \PYG{k}{scalar} \PYG{n}{f}\PYG{p}{,} \PYG{n}{src}\PYG{p}{;}
+  \PYG{k}{for} \PYG{p}{(}\PYG{n}{f}\PYG{p}{,}\PYG{n}{src} \PYG{n}{in} \PYG{n}{p}\PYG{p}{.}\PYG{n}{tracers}\PYG{p}{,}\PYG{n}{lsrc}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+    \PYG{n}{face} \PYG{k}{vector} \PYG{n}{flux}\PYG{p}{[];}
+    \PYG{n}{tracer\PYGZus{}fluxes} \PYG{p}{(}\PYG{n}{f}\PYG{p}{,} \PYG{n}{p}\PYG{p}{.}\PYG{n}{u}\PYG{p}{,} \PYG{n}{flux}\PYG{p}{,} \PYG{n}{p}\PYG{p}{.}\PYG{n}{dt}\PYG{p}{,} \PYG{n}{src}\PYG{p}{);}
+\end{Verbatim}

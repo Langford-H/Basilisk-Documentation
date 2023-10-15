@@ -1,0 +1,5 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8}]
+    \PYG{n}{flux}\PYG{p}{.}\PYG{n}{x}\PYG{p}{[]} \PYG{o}{=} \PYG{n}{f2}\PYG{o}{*}\PYG{n}{uf}\PYG{p}{.}\PYG{n}{x}\PYG{p}{[];}
+  \PYG{p}{\PYGZcb{}}
+\PYG{p}{\PYGZcb{}}
+\end{Verbatim}

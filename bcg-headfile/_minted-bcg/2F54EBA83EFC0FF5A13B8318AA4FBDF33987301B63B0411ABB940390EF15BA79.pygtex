@@ -1,0 +1,14 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8}]
+    \PYG{c+cp}{\PYGZsh{}if !EMBED}
+        \PYG{n}{foreach}\PYG{p}{()}
+          \PYG{n}{foreach\PYGZus{}dimension}\PYG{p}{()}
+            \PYG{n}{f}\PYG{p}{[]} \PYG{o}{+=} \PYG{n}{p}\PYG{p}{.}\PYG{n}{dt}\PYG{o}{*}\PYG{p}{(}\PYG{n}{flux}\PYG{p}{.}\PYG{n}{x}\PYG{p}{[]} \PYG{o}{\PYGZhy{}} \PYG{n}{flux}\PYG{p}{.}\PYG{n}{x}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{])}\PYG{o}{/}\PYG{p}{(}\PYG{n}{Delta}\PYG{o}{*}\PYG{n}{cm}\PYG{p}{[]);}
+    \PYG{c+cp}{\PYGZsh{}else }\PYG{c+c1}{// EMBED}
+        \PYG{n}{update\PYGZus{}tracer} \PYG{p}{(}\PYG{n}{f}\PYG{p}{,} \PYG{n}{p}\PYG{p}{.}\PYG{n}{u}\PYG{p}{,} \PYG{n}{flux}\PYG{p}{,} \PYG{n}{p}\PYG{p}{.}\PYG{n}{dt}\PYG{p}{);}\PYG{c+c1}{//This is a function that induced by embed.h which conducts same procedure with special care taken for embed boundary.}
+    \PYG{c+cp}{\PYGZsh{}endif }\PYG{c+c1}{// EMBED}
+      \PYG{p}{\PYGZcb{}}
+
+      \PYG{k}{if} \PYG{p}{(}\PYG{o}{!}\PYG{n}{p}\PYG{p}{.}\PYG{n}{src}\PYG{p}{)}
+        \PYG{n}{free} \PYG{p}{(}\PYG{n}{lsrc}\PYG{p}{);}
+    \PYG{p}{\PYGZcb{}}
+\end{Verbatim}
