@@ -45,7 +45,7 @@
 \begin{equation}
   \frac{\partial \Phi}{\partial t} + ( \mathbf{u} \cdot \nabla)\Phi = 0\label{equ:aim}
 \end{equation}
-where $\Phi$ is the scalar and $ \mathbf{u}$ is the velocity. The discrete time formulation of equation \ref{equ:aim} reads:
+where $\Phi$ is the scalar and $ \mathbf{u}$ is the velocity. The discrete time formulation of Eq.\ref{equ:aim} reads:
 \begin{equation}
   \frac{\Phi^{n+1}-\Phi^{n}}{\Delta t} + \mathbf{A}^{n+\frac{1}{2}} = 0 \label{equ:general}
 \end{equation}
@@ -57,16 +57,16 @@ The second step above is achieved by combining divergence free constraints $\nab
 \begin{equation}
   \Delta A^{n+ \frac{1}{2}} = \sum_{i=d} u_d^{n+ \frac{1}{2}}\Phi_d^{n + \frac{1}{2}} 
 \end{equation}
-where $u_d$ is the component of $ \mathbf{u}$ on normal direction of interface, $Delta$ is the length of the cell and $\Phi_d$ is the correspounding value at the interface. Then the critical is how to obtain $\Phi_d^{n + \frac{1}{2}}$. According to \cite{popinet2003gerris}, using Taylor expansion we have
+where $u_d$ is the component of $ \mathbf{u}$ on normal direction of interface, $Delta$ is the length of the cell and $\Phi_d$ is the corresponding value at the interface. Then the critical is how to obtain $\Phi_d^{n + \frac{1}{2}}$. According to \cite{popinet2003gerris}, using Taylor expansion we have
 \begin{equation}
   \Phi^{n+ \frac{1}{2}}_d = \Phi^n+ \frac{\Delta}{2} \frac{\partial \Phi^n}{\partial x_d} + \frac{\Delta t}{2} \frac{\partial \Phi^n}{\partial t} + O(\Delta^2,\Delta t^2)
 \end{equation}
-Replacing $ \frac{\partial \Phi^n}{\partial x_d}$ with equation \ref{equ:aim} yielding 
+Replacing $ \frac{\partial \Phi^n}{\partial x_d}$ with Eq.\ref{equ:aim} yielding 
 \begin{equation}
   \Phi^{n+ \frac{1}{2}}_d = \Phi^n + [\frac{\Delta}{2}- \frac{\Delta t}{2} \mathbf{u}^n \cdot \mathbf{n}_d] \frac{\partial \Phi^n}{\partial x_d} - \frac{\Delta t}{2} \mathbf{u}^n\cdot \mathbf{n}_e \frac{\partial \Phi^n}{\partial x_e} - \frac{\Delta t}{2} \mathbf{g}^n \label{equ:taylor}
 \end{equation}
 Subscript $e$ represents direction other than current direction $d$.
-Compromise is taken for sake of convenience (maybe) that $ \mathbf{u}^n$ in equation \ref{equ:taylor} is repleced by $ \mathbf{u}^{n + \frac{1}{2}}$ so that $ \mathbf{u}^n\cdot \mathbf{n}_d$ can be computed by $u_d^{n + \frac{1}{2}}$. (see Sec.\ref{sec:tracerdetail} for more details).
+Compromise is taken for sake of convenience (maybe) that $ \mathbf{u}^n$ in Eq.\ref{equ:taylor} is repleced by $ \mathbf{u}^{n + \frac{1}{2}}$ so that $ \mathbf{u}^n\cdot \mathbf{n}_d$ can be computed by $u_d^{n + \frac{1}{2}}$. (see Sec.\ref{sec:tracerdetail} for more details).
 \section{Functions}
 
 \subsection{\func{tracer\_fluxes}}
@@ -106,8 +106,8 @@ Data of \emph{face vector} type is stored on staggered mesh\cite{harlow1965numer
      \caption{Staggered mesh.}
      \label{fig:staggered}
 \end{figure}
-Components are saved in correspounding face with single value. The direction of the component express itself in the feature of the cell face. Therefore, $ \mathbf{u}^{n + \frac{1}{2}} \cdot \mathbf{n}_x$ can simply be $ \frac{1}{2}(uf_x[i]+uf_x[i+1])$.\par
-Advection term employs BCG scheme\cite{martin2000cell}, a second order upwinded scheme. It first requires face-centered approximation of velocity $u_d^n,v_e^n(w_f^n)$. Then equation \ref{equ:taylor} is adapted to a upwinded scheme
+Components are saved in corresponding face with single value. The direction of the component express itself in the feature of the cell face. Therefore, $ \mathbf{u}^{n + \frac{1}{2}} \cdot \mathbf{n}_x$ can simply be $ \frac{1}{2}(uf_x[i]+uf_x[i+1])$.\par
+Advection term employs BCG scheme\cite{martin2000cell}, a second order upwinded scheme. It first requires face-centered approximation of velocity $u_d^n,v_e^n(w_f^n)$. Then Eq.\ref{equ:taylor} is adapted to a upwinded scheme
 \begin{equation}
   \Phi_d^{n+ \frac{1}{2}}=
     \left \{ 
@@ -142,7 +142,7 @@ where $v_e^{trans} = \frac{1}{2}(v_e^{trans}[i,j]+v_e^{trans}[i,j+1])$
         \para{f} = $\Phi^n$ \para{uf} = $u_d^{n+ \frac{1}{2}}$\\ \para{flux}(empty) \para{dt}=$\Delta t$\\ \para{src} = $ \mathbf{g}^n$\\
         \textbf{gradient}:\\
         \para{g} = $\nabla$ \para{f} = $\nabla \Phi$
-      }
+      };
   \end{tikzpicture}
  \columnbreak
  \begin{minted}[obeytabs=false,mathescape=true,breaklines]{lexer.py:DiffLexer -x}
@@ -172,7 +172,7 @@ void tracer_fluxes (scalar f,
         \para{un}=$ \frac{\Delta t}{\Delta}\mathbf{u}^{n+ \frac{1}{2}}\cdot \mathbf{n}_{dp}$\\=$ \frac{\Delta t}{2\Delta}(uf_d[i]+uf_d[i+1])/(fm.d[i]+fm.d[i+1])$\\ $\approx  \frac{\Delta t}{\Delta} \frac{uf_x[i]}{fm.x[i]}$\\
         \textbf{component of main direction}\footnote{See \ref{sec:tracerdetail} for details about upwinded }:\\
         \para{f2} = $\Phi^n + \frac{\Delta}{2}upwind[1- \frac{\Delta t}{\Delta} \mathbf{u}^{n+\frac{1}{2}}\cdot \mathbf{n}_{dp},-1-\frac{\Delta t}{\Delta} \mathbf{u}^{n+\frac{1}{2}}\cdot \mathbf{n}_{dp}] \frac{\partial \Phi^n}{\partial x_d}+\frac{\Delta t}{2}\mathbf{g}_d^n$ 
-      }
+      };
   \end{tikzpicture}
   \columnbreak
   \begin{minted}[obeytabs=false,mathescape=true,breaklines]{lexer.py:DiffLexer -x}
@@ -199,7 +199,7 @@ void tracer_fluxes (scalar f,
         \textbf{component of other direction}:\\
         \para{fyy}(\para{fzz})= $\frac{\partial \Phi^n}{\partial x_e}\cdot \Delta$\\
         \para{f2} -= $ \frac{\Delta t}{2} \mathbf{u}^n\cdot \mathbf{n}_{ep} \frac{\partial \Phi^n}{\partial x_e}$ 
-      }
+      };
   \end{tikzpicture}
   \columnbreak
   \begin{minted}[obeytabs=false,mathescape=true,breaklines]{lexer.py:DiffLexer -x}
@@ -232,7 +232,7 @@ void tracer_fluxes (scalar f,
         \textbf{Assemble}\\
         assemble the final result, current direction is $d$\\
         \para{flux.d}=$u_d^{n+ \frac{1}{2}}\Phi_d^{n+ \frac{1}{2}}$
-      }
+      };
   \end{tikzpicture}
   \columnbreak
   \begin{minted}[obeytabs=false,mathescape=true,breaklines]{lexer.py:DiffLexer -x}
@@ -290,7 +290,7 @@ For cell $A$, direction of highlighted face is opposite to coordinate while posi
         \textbf{Starting Point}\\
         \textbf{input}: \\
         \para{tracers} = $\Phi^n$ \para{u} = $u_d^{n+ \frac{1}{2}}$\\ \para{dt}=$\Delta t$ \para{src} = $ \mathbf{g}^n$\\
-      }
+      };
   \end{tikzpicture}
   \columnbreak
   \begin{minted}[obeytabs=false,mathescape=true,breaklines]{lexer.py:DiffLexer -x}
@@ -323,7 +323,7 @@ For cell $A$, direction of highlighted face is opposite to coordinate while posi
         Traversal each elements in \para{tracers} (if \para{tracers} is vector, then this step traversal component on every direction)\\
         \textbf{computation}: \\
         \para{flux} = $\Phi^{n+ \frac{1}{2}}_d u_d^{n+ \frac{1}{2}}$\\
-      }
+      };
   \end{tikzpicture}
   \columnbreak
   \begin{minted}[obeytabs=false,mathescape=true,breaklines]{lexer.py:DiffLexer -x}
@@ -347,8 +347,8 @@ For cell $A$, direction of highlighted face is opposite to coordinate while posi
         \textbf{Update}\\
         \para{tracers}(updated) = $\Phi^{n+1}$ = $\Phi^n-\Delta t A^{n+ \frac{1}{2}}$\\
         = $\Phi^n- \Delta t \sum u_d^{n+ \frac{1}{2}}\Phi_d^{n + \frac{1}{2}}$
-        = $f[] + \Deltat \sum_{each\_di} (flux.d[i]-flux.d[i-1])$
-      }
+        = $f[] + \Delta t \sum_{each\_di} (flux.d[i]-flux.d[i-1])$
+      };
   \end{tikzpicture}
   \columnbreak
   \begin{minted}[obeytabs=false,mathescape=true,breaklines]{lexer.py:DiffLexer -x}
@@ -369,7 +369,7 @@ For cell $A$, direction of highlighted face is opposite to coordinate while posi
 
 \appendix
 \section{Caculation of Face Centered Normal Veloctiy}
-It can be seen from \ref{sec:intro}, the computation of face centered normal velocity $u_d^{n+ \frac{1}{2}}$ is of great importance to construct advection term. The detailed procedure of extrapolation is shown in documentation of \textbf{cnetered.h}. The output of such variable follows a similiar step as equation \ref{equ:taylor} but without pressure term since the face centered velocity will be projected with an edge-centered projection. This additional projection ensures the feature of conservative of correspounding method.\par
-When it comes to the resolution of NS equation, $\Phi$ in governing eqaution \ref{equ:aim} is the cell-centered vector $ \mathbf{u}^n$. According to Martin\cite{martin2000cell}, normal components caculated by equation\ref{equ:taylor} can simply be replaced by $u_d^{n+ \frac{1}{2}}$, which means we only need to compute tangential fluxes. However, after series of tests, reuse of normal fluxes will lead to unstable at sharp angles. Thus all components is recomputed in Basilisk\cite{popinet2003gerris}.
+It can be seen from \ref{sec:intro}, the computation of face centered normal velocity $u_d^{n+ \frac{1}{2}}$ is of great importance to construct advection term. The detailed procedure of extrapolation is shown in documentation of \textbf{cnetered.h}. The output of such variable follows a similiar step as Eq.\ref{equ:taylor} but without pressure term since the face centered velocity will be projected with an edge-centered projection. This additional projection ensures the feature of conservative of corresponding method.\par
+When it comes to the resolution of NS equation, $\Phi$ in governing eqaution \ref{equ:aim} is the cell-centered vector $ \mathbf{u}^n$. According to Martin\cite{martin2000cell}, normal components caculated by Eq.\ref{equ:taylor} can simply be replaced by $u_d^{n+ \frac{1}{2}}$, which means we only need to compute tangential fluxes. However, after series of tests, reuse of normal fluxes will lead to unstable at sharp angles. Thus all components is recomputed in Basilisk\cite{popinet2003gerris}.
 \printbibliography
 \end{document}
