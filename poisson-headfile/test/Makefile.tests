@@ -1,0 +1,16 @@
+# Automatically generated using 'make Makefile.tests'
+# DO NOT EDIT, edit 'Makefile' instead
+ALLTESTS = \
+	circle.c \
+
+plots: \
+	circle/plots.page \
+
+TESTS = \
+
+SPECIAL_TESTS = \
+
+ALLPAGES = \
+	circle.c.page \
+	poisson.h.page \
+

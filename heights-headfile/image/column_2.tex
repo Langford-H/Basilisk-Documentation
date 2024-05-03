@@ -1,0 +1,280 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage{tikz-3dplot}
+\usepackage{romannum}
+\usepackage[active,tightpage]{preview}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{0.125pt}
+\usetikzlibrary[angles,quotes]
+%\usetikzlibrary{calc,patterns,decorations.pathmorphing,decorations.markings,arrows}
+\definecolor{init}{RGB}{205,245,253}
+\definecolor{initb}{RGB}{87,108,188}
+\definecolor{S}{RGB}{251,161,183}
+\definecolor{Sb}{RGB}{230,62,109}
+\definecolor{iter}{RGB}{255,242,204}
+\definecolor{iterb}{RGB}{250,171,120}
+\definecolor{encode}{RGB}{255,206,254}
+\definecolor{encodeb}{RGB}{214,123,255}
+
+\newcommand{\current}[2]
+{
+    \draw[red,very thick](#1-0.5,#2-0.5)--(#1+0.5,#2-0.5)--(#1+0.5,#2+0.5)--(#1-0.5,#2+0.5)--cycle;
+}
+
+\newcommand{\intecurr}[2]
+{
+    \draw[blue,very thick](#1-0.5,#2-0.5)--(#1+0.5,#2-0.5)--(#1+0.5,#2+0.5)--(#1-0.5,#2+0.5)--cycle;
+}
+
+\newcommand{\fcell}[2]
+{
+    \filldraw[gray,xshift=-0.5cm,yshift=-0.5cm](#1,#2) rectangle ++(1,1);
+}
+
+\newcommand{\surface}[2]
+{
+    \filldraw[gray,xshift=-0.5cm,yshift=-0.5cm](#1,#2)--(#1+1,#2)--(#1+1,#2+1)--cycle;
+}
+
+\newcommand{\funsqu}[6]%color(2) center(2) height width
+{
+    \coordinate(A) at (#3-0.5*#6,#4-0.5*#5);
+    \coordinate(B) at (#3+0.5*#6,#4+0.5*#5); 
+
+    \filldraw[rounded corners,#1,opacity=0.5] (A) rectangle (B);
+    \draw[thick,rounded corners,#2] (A) rectangle (B);
+}
+
+\begin{document}
+
+\tdplotsetmaincoords{70}{60}
+\begin{tikzpicture}
+    \funsqu{init}{initb}{3.25}{2}{6}{14.5};
+    \node[initb,rotate=90] at (-3.75,4.25) {\Large initial};
+    \node[initb,rotate=90] at (-3.75,0.5) {\Large \textcolor{black}{$j=1$} decode};
+    %\node[anchor=west] at (-4,-0.5) {\Large$j=1$};
+
+    \draw[initb,very thick](-4,2.0)--(10.5,2.0);
+
+    \newcommand{\Scx}{3.25};
+    \newcommand{\Scy}{-1.5};
+    \newcommand{\Scwd}{6};
+    \newcommand{\Scht}{0.5};
+
+    \surface{\Scx}{\Scy+5.875};
+    \current{\Scx}{\Scy+5.875};
+
+    \current{\Scx-0.25*\Scwd}{\Scy+5.875};
+
+    \fcell{\Scx+0.25*\Scwd}{\Scy+5.875};
+    \current{\Scx+0.25*\Scwd}{\Scy+5.875};
+%%%first bar%%%
+    \funsqu{S}{Sb}{\Scx}{\Scy+4}{\Scht}{\Scwd};
+    \node[Sb] at (\Scx-0.5*\Scwd+0.25,\Scy+4) {$S$};
+    \node[Sb] at (\Scx-0.25*\Scwd,\Scy+4) {$0$};
+    \node[Sb] at (\Scx,\Scy+4) {$f$};
+    \node[Sb] at (\Scx+0.25*\Scwd,\Scy+4) {$1$};
+    
+    \funsqu{init}{initb}{\Scx}{\Scy+4.75}{\Scht}{\Scwd};
+    \node[initb] at (\Scx-0.5*\Scwd+0.25,\Scy+4.75) {$c[]$};
+    \node[initb] at (\Scx-0.25*\Scwd,\Scy+4.75) {$0$};
+    \node[initb] at (\Scx,\Scy+4.75) {$f$};
+    \node[initb] at (\Scx+0.25*\Scwd,\Scy+4.75) {$1$};
+
+    \foreach \x in {-0.25,0,0.25}
+    {
+        \draw[very thick](\Scx+\x*\Scwd,\Scy+5.375)--(\Scx+\x*\Scwd,\Scy+5.0);
+        \draw[very thick](\Scx+\x*\Scwd,\Scy+4.5)--(\Scx+\x*\Scwd,\Scy+4.25);
+    }
+
+    \funsqu{init}{initb}{\Scx}{\Scy+2.25}{\Scht}{13};
+    \node[initb] at (\Scx-5.25+0.25,\Scy+2.25) {$(stats.s,stats.h)$};
+    \node[initb] at (\Scx-5.25+3,\Scy+2.25) {$(-1,nodata)$};
+    \node[initb] at (\Scx-5.25+5.5,\Scy+2.25) {$(0,h[]-100)$};
+    \node[initb] at (\Scx-5.25+8,\Scy+2.25) {$(1,h[]-200)$};
+    \node[initb] at (\Scx-5.25+10.5,\Scy+2.25) {$(-1,h[])$};
+
+    \draw[rounded corners, very thick](\Scx-0.25*\Scwd,\Scy+3.75)--([yshift=-0.2cm]\Scx-0.25*\Scwd,\Scy+3.75)--(\Scx-5.25+2.5,\Scy+3.55)--(\Scx-5.25+2.5,\Scy+2.5);
+    
+    \draw[rounded corners, very thick](\Scx-0.25*\Scwd,\Scy+3.75)--([yshift=-0.2cm]\Scx-0.25*\Scwd,\Scy+3.75)--(\Scx-5.25+10.75,\Scy+3.55)--(\Scx-5.25+10.75,\Scy+2.5);
+
+    \draw[rounded corners, very thick](\Scx,\Scy+3.75)--([yshift=-0.5cm]\Scx,\Scy+3.75)--(\Scx,\Scy+3.25)--(\Scx,\Scy+2.5);
+    
+    \draw[rounded corners, very thick]((\Scx,\Scy+3.75)--([yshift=-0.5cm]\Scx,\Scy+3.75)--(\Scx+2.75,\Scy+3.25)--(\Scx+2.75,\Scy+2.5);
+
+    \draw[rounded corners, very thick]((\Scx,\Scy+3.75)--([yshift=-0.5cm]\Scx,\Scy+3.75)--(\Scx-2.5,\Scy+3.25)--(\Scx-2.5,\Scy+2.5);
+
+    \draw[rounded corners, very thick](\Scx+0.25*\Scwd,\Scy+3.75)--([yshift=-0.8cm]\Scx+0.25*\Scwd,\Scy+3.75)--(\Scx-2.25,\Scy+2.95)--(\Scx-2.25,\Scy+2.5);
+    
+    \draw[rounded corners, very thick](\Scx+0.25*\Scwd,\Scy+3.75)--([yshift=-0.8cm]\Scx+0.25*\Scwd,\Scy+3.75)--(\Scx+5.25,\Scy+2.95)--(\Scx+5.25,\Scy+2.5);
+
+    \node[anchor=east,yshift=0.2cm] at (\Scx-5.25+2.5,\Scy+2.5) {$h==300$};
+    \node[anchor=east,yshift=0.2cm] at (\Scx,\Scy+2.5) {$90\leq h<190$};
+    \node[anchor=east,yshift=0.2cm] at (\Scx+2.75,\Scy+2.5) {$190\leq h$};
+    \node[anchor=east,yshift=0.2cm] at (\Scx+5.25,\Scy+2.5) {$-10\leq h < 90$};
+
+    \draw[very thick](\Scx+2.75,\Scy+2)--(\Scx+2.75,\Scy+1.5);
+    \draw[very thick](\Scx,\Scy+2)--(\Scx,\Scy+1.5);
+        
+    \funsqu{S}{Sb}{\Scx+1.15}{\Scy+1.25}{\Scht}{5};
+    \node[Sb] at (\Scx-1.15,\Scy+1.25) {$S$};
+    \node[Sb] at (\Scx,\Scy+1.25) {$f\longrightarrow0$};
+    \node[Sb] at (\Scx+2.75,\Scy+1.25) {$f\longrightarrow1$};
+    \draw[very thick,rounded corners](\Scx,\Scy+1)--(\Scx,\Scy+0.75)--(\Scx+4,\Scy+0.75);
+    \draw[very thick,rounded corners](\Scx+2.75,\Scy+1)--(\Scx+2.75,\Scy+0.75);
+    \node[initb,xshift=0.1cm] at (\Scx+4,\Scy+0.75) {\Romannum{5}};
+%%%second bar%%%
+    \funsqu{S}{Sb}{\Scx}{\Scy}{\Scht}{\Scwd};
+    \node[Sb] at (\Scx-0.5*\Scwd+0.25,\Scy) {$S$};
+    \node[Sb] at (\Scx-0.25*\Scwd,\Scy) {$0$};
+    \node[Sb] at (\Scx,\Scy) {$f$};
+    \node[Sb] at (\Scx+0.25*\Scwd,\Scy) {$1$};
+
+  
+    \coordinate (0start) at (\Scx-0.25*\Scwd,\Scy-0.5*\Scht);
+    \coordinate (fstart) at (\Scx,\Scy-0.5*\Scht);
+    \coordinate (1start) at (\Scx+0.25*\Scwd,\Scy-0.5*\Scht);
+    
+    \funsqu{iter}{iterb}{3.25}{-5.0}{5}{14.5};
+    
+    \foreach \x in {-2,0.7,...,8.8}
+    {
+            \funsqu{iter}{iterb}{\x}{-5}{4}{2.5};
+    }
+
+    \funsqu{S}{Sb}{3.25}{-6.25}{0.5}{14.5};
+    \node[Sb] at (-3.75,-6.25) {S};
+    \node[iterb,rotate=90] at (-3.75,-3.5) {\Large iteration};
+    \node[iterb] at (-3.0,-6.75) {A};
+    \node[iterb] at (-0.3,-6.75) {B};
+    \node[iterb] at (2.4,-6.75) {C};
+    \node[iterb] at (5.1,-6.75) {D};
+    \node[iterb,rotate=90] at (7.7,-5) {else};
+
+%%%A%%% for surface which meets full or empty
+    \fcell{-1.4}{-3.75};
+
+    \intecurr{-2.6}{-3.75};
+    \intecurr{-1.4}{-3.75};
+
+%%%B%%% for full which finds empty
+    \intecurr{0.7}{-3.75};
+    
+%%%C%%% for empty which finds full
+    \fcell{3.4}{-3.75};
+    \intecurr{3.4}{-3.75};
+
+%%%D%%% for empty or full first meets surface and return
+    \surface{6.1}{-3.75};
+    \intecurr{6.1}{-3.75};
+    
+    \fcell{6.7}{-5.25};
+    \intecurr{5.5}{-5.25};
+    \intecurr{6.7}{-5.25};
+
+%%%S=0%%%
+    \draw[rounded corners,very thick](0start)--([yshift=-0.95cm]0start)--(3.4,-2.7)--(3.4,-3.25) node [ anchor=east, yshift=0.25cm] {if};
+    \draw[very thick](3.4,-4.25)--(3.4,-6);
+    
+    \draw[rounded corners,very thick](0start)--([yshift=-0.95cm]0start)--(5.8,-2.7)--(5.8,-3.25) node [ anchor=east, yshift=0.25cm] {if};
+    \draw[rounded corners,very thick](5.8,-4.25)--(5.8,-4.5)--(5.5,-4.5)--(5.5,-4.75)node[anchor=east,yshift=0.25cm,xshift=0.1cm]{and};
+    \draw[very thick](5.5,-5.75)--(5.5,-6);
+
+    \draw[rounded corners,very thick](0start)--([yshift=-0.95cm]0start)--(8.0,-2.7)--(8.0,-6);
+
+%%%S=surface%%%
+    \draw[rounded corners,very thick](fstart)--([yshift=-0.65cm]fstart)--(-2,-2.4)--(-2,-3.0)--(-2.6,-3.0)--(-2.6,-3.25) node [ anchor=east, yshift=0.25cm] {if};
+    \draw[very thick](-2.6,-4.25)--(-2.6,-6);
+    
+    \draw[rounded corners,very thick](fstart)--([yshift=-0.65cm]fstart)--(-2,-2.4)--(-2,-3.0)--(-1.4,-3.0)--(-1.4,-3.25) node [ anchor=west, yshift=0.25cm] {or};
+    \draw[very thick](-1.4,-4.25)--(-1.4,-6);
+    
+    \draw[rounded corners,very thick](fstart)--([yshift=-0.65cm]fstart)--(8.8,-2.4)--(8.8,-6);
+
+%%%S=1%%%
+    \draw[rounded corners,very thick](1start)--([yshift=-0.35cm]1start)--(0.7,-2.1)--(0.7,-3.25)node[anchor=east,yshift=0.25cm]{if};
+    \draw[very thick](0.7,-4.25)--(0.7,-6);
+
+    \draw[rounded corners,very thick](1start)--([yshift=-0.35cm]1start)--(9.6,-2.1)--(9.6,-6);
+
+    \draw[rounded corners,very thick](1start)--([yshift=-0.35cm]1start)--(6.4,-2.1)--(6.4,-3.25)node[ anchor=east, yshift=0.25cm] {if};
+    \draw[rounded corners,very thick](6.4,-4.25)--(6.4,-4.5)--(6.7,-4.5)--(6.7,-4.75)node[anchor=west,yshift=0.25cm,xshift=-0.1cm]{and};
+    \draw[very thick](6.7,-5.75)--(6.7,-6);
+
+%%%S2value%%%
+    \node[Sb] at (-1.4,-6.25) {$1$};
+    \node[Sb] at (-2.6,-6.25) {$0$};
+    \node[Sb] at (0.7,-6.25) {$-1$};
+    \node[Sb] at (3.4,-6.25) {$-1$};
+    \node[Sb] at (5.5,-6.25) {$0$};
+    \node[Sb] at (6.7,-6.25) {$1$};
+    \node[Sb] at (8.0,-6.25) {$0$};
+    \node[Sb] at (8.8,-6.25) {$f_i$};
+    \node[Sb] at (9.6,-6.25) {$1$};
+
+    \funsqu{encode}{encodeb}{3.25}{-8}{0.5}{14.5};
+    \node[encodeb] at (-2.6,-8) {\Romannum{1}};
+    \node[encodeb] at (-1.4,-8) {\Romannum{2}};
+    \node[encodeb] at (2.05,-8) {\Romannum{3}};
+    \node[encodeb] at (7.5,-8) {\Romannum{4}};
+
+    \draw[very thick,rounded corners](-1.4,-6.5)--(-1.4,-7.75);
+    \draw[very thick,rounded corners](-2.6,-6.5)--(-2.6,-7.75);
+    \draw[very thick,rounded corners](0.7,-6.5)--(0.7,-7)--(2.05,-7)--(2.05,-7.75);
+    \draw[very thick,rounded corners](3.4,-6.5)--(3.4,-7)--(2.05,-7)--(2.05,-7.75);
+
+    \draw[very thick,rounded corners](5.5,-6.5)--(5.5,-7)--(7.5,-7)--(7.5,-7.75);
+    \draw[very thick,rounded corners](6.7,-6.5)--(6.7,-7)--(7.5,-7)--(7.5,-7.75);
+    \draw[very thick,rounded corners](8,-6.5)--(8,-7)--(7.5,-7)--(7.5,-7.75);
+    \draw[very thick,rounded corners](8.8,-6.5)--(8.8,-7)--(7.5,-7)--(7.5,-7.75);
+    \draw[very thick,rounded corners](9.6,-6.5)--(9.6,-7)--(7.5,-7)--(7.5,-7.75);
+
+%%%encode%%%
+    \funsqu{encode}{encodeb}{3.25}{-10.25}{3.5}{14.5};
+    \node[encodeb,rotate=90] at (-3.75,-10.25) {\Large \textcolor{black}{$j=-1$}encode};
+    \draw[encodeb,very thick](2.0,-8.5)--(2.0,-12);
+    \funsqu{encode}{encodeb}{-1}{-9.0}{0.5}{4};
+    \funsqu{encode}{encodeb}{-1}{-10.0}{0.5}{4};
+    \funsqu{encode}{encodeb}{-1}{-11.25}{1}{4};
+    
+    \node[encodeb] at (-2.75,-9){$A$};
+    \node[encodeb] at (-2.0,-9){\Romannum{4}};
+
+    \node[encodeb] at (-2.75,-10){$B$};
+    \node[encodeb] at (-2.0,-10){\Romannum{3}};
+
+    \node[encodeb] at (-2.75,-11){$C$};
+    \node[encodeb] at (-2.0,-11){\Romannum{1}};
+    \node[encodeb] at (-2.0,-11.5){\Romannum{2}};
+
+    \node at (0,-9){$h[]=300$};
+    \node at (0,-10){$h[]=H$};
+    \node at (-0.1,-11){$h[]=H+100$};
+    \node at (-0.1,-11.5){$h[]=H+200$};
+
+%%%output
+    \node[encodeb,rotate=90] at (2.25,-10.25) {\Large \textcolor{black}{$j=1$}output};
+    \funsqu{encode}{encodeb}{5.25}{-9.0}{0.5}{4.5};
+    \node[anchor = west] at (2.875,-9) {\textcolor{initb}{\Romannum{5}} or $(\textcolor{encodeb}{\Romannum{3}}$ and $H<\textcolor{initb}{stats.h})^\ast$};
+    \funsqu{init}{initb}{9.125}{-9.25}{1}{2.25};
+    \node[anchor=west] at (8.0,-9) {$\textcolor{initb}{stats.s}=\textcolor{Sb}{S}$};
+    \node[anchor=west] at (8.0,-9.5) {$\textcolor{initb}{stats.h}=H$};
+
+    \draw[very thick](7.5,-9)--(8,-9);
+    
+    \funsqu{init}{initb}{4.125}{-10.25}{0.5}{2.25};
+    \funsqu{init}{initb}{9.125}{-10.25}{0.5}{2.25};
+    \funsqu{init}{initb}{9.125}{-11}{0.5}{2.25};
+
+    \node[anchor=west] at (3.0,-10.25) {$stats.s\neq-1$};
+    \node[anchor=west] at (8.0,-10.25) {$h[]=nodata$};
+    \node[anchor=west] at (8.0,-11) {$h[]=stats.h$};
+
+    \draw[very thick](5.25,-10.25)--(8,-10.25)node[anchor=east,yshift=0.15cm]{yes};
+    \draw[very thick,rounded corners](5.25,-10.25)--(7.25,-10.25)--(7.25,-11)--(8,-11)node[anchor=east,yshift=0.15cm]{no};
+
+\end{tikzpicture}
+
+\end{document}
+
+
