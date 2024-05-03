@@ -1,5 +1,5 @@
 # Basilisk Documentation
-This is a Documentation for PDE solver [Basilisk](http://basilisk.fr/) written by Haochen Huang, a master candidate in XJTU.\\
+This is a Documentation for PDE solver [Basilisk](http://basilisk.fr/) written by Haochen Huang, a master candidate in XJTU.
 
 The doc is written for those who are interested in how things work inside Basilisk and want to alter the solver.
 
