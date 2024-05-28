@@ -53,7 +53,7 @@
     \vskip 1em%
     {\large \@date\par}%
     \vskip 1em%
-    {\large version:1.0}%
+    {\large version:2.0}%
   \end{center}%
   \par
   \vskip 1.5em}
@@ -72,28 +72,62 @@ where $\Phi$ is the scalar and $ \mathbf{u}$ is the velocity. The discrete time 
 \begin{equation}
   \frac{\Phi^{n+1}-\Phi^{n}}{\Delta t} + \mathbf{A}^{n+\frac{1}{2}} = 0 \label{equ:general}
 \end{equation}
-Where $ \mathbf{A}^{n+ \frac{1}{2}}$ is the abbreviation of advection term in BCG\cite{bell1989second,popinet2003gerris} scheme (and is the reason why the name of this file called 'bcg.h'), and is intergrated within the controlled volume
+Where $ \mathbf{A}^{n+ \frac{1}{2}}$ is the abbreviation of advection term. With the conservative constraints $\nabla \cdot \mathbf{u} = 0$, the integral form reads:
 \begin{equation}
   \int_{\Gamma} A^{n+ \frac{1}{2}} = \int_{\Gamma} [( \mathbf{u}\cdot \nabla)\Phi]^{n+ \frac{1}{2}} = \int_{\Gamma} [\nabla\cdot( \mathbf{u} \Phi)]^{n+ \frac{1}{2}} = \int_{\partial \Gamma} ( \mathbf{u}^{n + \frac{1}{2}} \cdot \mathbf{n}) \Phi^{n+ \frac{1}{2}}
 \end{equation}
-The second step above is achieved by combining divergence free constraints $\nabla\cdot \mathbf{u}=0$ and the $ \mathbf{n}$ represents the normal direction of cell interface. For quadtree or octree cells, the overall calculation turns out to be
+where $ \mathbf{n}$ represents the normal direction of cell interface. For cartesian cell employed in Basilisk, the calculation turns out to be
 \begin{equation}
-  \Delta A^{n+ \frac{1}{2}} = \sum_{i=d} u_d^{n+ \frac{1}{2}}\Phi_d^{n + \frac{1}{2}} 
+  \Delta A^{n+ \frac{1}{2}} = \sum_{d} s_d u_{f,d}^{n+ \frac{1}{2}}\Phi_{f,d}^{n + \frac{1}{2}} 
 \end{equation}
-where $u_d$ is the component of $ \mathbf{u}$ on normal direction of interface, $Delta$ is the length of the cell and $\Phi_d$ is the corresponding value at the interface. Then the critical is how to obtain $\Phi_d^{n + \frac{1}{2}}$. According to \cite{popinet2003gerris}, using Taylor expansion we have
+Note in this documentation, the subscript $f$ denotes face value stored in staggered mesh\cite{1965_Harlow}, otherwise it is cell-average value stored in center of the cell. Subscript $d$ is the notation of specific face ($e,w,n,s$ for 2D and $e,s,n,s,f,b$ for 3D) for a single cell. In addition, readers may found algebraic notation without $d$ such as $u_f$ in the upcoming discussion which refers to the same thing. This is because in the most cases $d$ is used to addressed spatial relationship between face and cell from cell-perspective, such relation shall vanish from face-perspective and so does $d$.
+
+The following discussions are conducted under 2D condition and results of 3D is easily to obtain accordingly. $s_d$ represents sign function which reads
 \begin{equation}
-  \Phi^{n+ \frac{1}{2}}_d = \Phi^n+ \frac{\Delta}{2} \frac{\partial \Phi^n}{\partial x_d} + \frac{\Delta t}{2} \frac{\partial \Phi^n}{\partial t} + O(\Delta^2,\Delta t^2)
+    s_d = 
+    \left\{
+    \begin{array}{cc}
+    1\ \ d=e,n \\
+    -1\ \ d=w,s
+    \end{array}
+    \right.
 \end{equation}
-Replacing $ \frac{\partial \Phi^n}{\partial x_d}$ with equation \ref{equ:aim} yielding 
+The problem now becomes how to obtain $u_f^{n+1/2}$ and $\Phi_f^{n+1/2}$. Basilisk employs BCG scheme to tackle such issue. The scheme, which is originally named by three authors\cite{1989_Bell}, stems from the algorithm intending to apply second order Godunov method to incompressible flow. It obtains value at $n+\frac{1}{2}$ not by averaging but by considering the Taylor series, for each cell:
 \begin{equation}
-  \Phi^{n+ \frac{1}{2}}_d = \Phi^n + [\frac{\Delta}{2}- \frac{\Delta t}{2} \mathbf{u}^n \cdot \mathbf{n}_d] \frac{\partial \Phi^n}{\partial x_d} - \frac{\Delta t}{2} \mathbf{u}^n\cdot \mathbf{n}_e \frac{\partial \Phi^n}{\partial x_e} - \frac{\Delta t}{2} \mathbf{g}^n \label{equ:taylor}
+  \Tilde{\Phi}^{n+ \frac{1}{2}}_{f,d} = \Phi^n+ s_d\frac{\Delta}{2} \frac{\partial \Phi^n}{\partial x_d} + \frac{\Delta t}{2} \frac{\partial \Phi^n}{\partial t} + O(\Delta^2,\Delta t^2)
 \end{equation}
-Subscript $e$ represents direction other than current direction $d$.
-Compromise is taken for sake of convenience (maybe) that $ \mathbf{u}^n$ in equation \ref{equ:taylor} is replaced by $ \mathbf{u}^{n + \frac{1}{2}}$ so that $ \mathbf{u}^n\cdot \mathbf{n}_d$ can be computed by $u_d^{n + \frac{1}{2}}$. (see Sec.\ref{sec:tracerdetail} for more details).
+Where $x_d=x$ for $d = e,w$ and $x_d=y$ for $d = n,s$. Replacing $ \frac{\partial \Phi^n}{\partial x_d}$ with Euler equation \ref{equ:aim} yielding 
+\begin{equation}
+  \Tilde{\Phi}^{n+ \frac{1}{2}}_{f,d} = \Phi^n + [s_d \frac{\Delta}{2}- \frac{\Delta t}{2} u_d] \frac{\partial \Phi^n}{\partial x_d} - \frac{\Delta t}{2} u_o \frac{\partial \Phi^n}{\partial x_o}\label{equ:taylor}
+\end{equation}
+where $u_d$ is the cell-centered value on $d$ direction (i.e. $u_x$ for $d = e,w$, $u_y$ for $d = n,s$). Subscript $o$ represents directions other than $d$.
+Since aiming equation \ref{equ:aim} is advection-only, a simple upwind scheme is therefore employed\cite{2000_Martin,1998_Martin} to adapt each term in equation \ref{equ:taylor}:
+\begin{align}
+  \Tilde{\Phi}^{n+ \frac{1}{2}}_{f,d} &= \Phi^n + [s_d \frac{\Delta}{2}- max(\frac{\Delta t}{2} u_d,0)] \frac{\partial \Phi^n}{\partial x_d} - \frac{\Delta t}{2} u_o \overline{\frac{\partial \Phi^n}{\partial x_o}}\label{equ:upwind} \\
+  \overline{\frac{\partial \Phi^n}{\partial x_o}} &= \left\{
+  \begin{array}{cc}
+       (\Phi^n[0] - \Phi^n[-1])/\Delta&\ if\ u_o>0 \\
+       (\Phi^n[1] - \Phi^n[0])/\Delta&\ if\ u_o<0
+  \end{array}
+  \right.\label{equ:upwind2}
+\end{align}
+If not additionally declared, $\frac{\partial \Phi^n}{\partial x_d}$ is computed with central scheme.
+Given four face values from each cell, each face now has two values from its neighbor cell which are left value and right value in traditional Godunov method. Unlike the traditional method which obtains the final face value $\Phi_{f,d}$ by solving Riemann problem, the upwind scheme is again applied to determine $\Phi_{f,d}$ in current algorithm (the value is counted from each face hence the subscript $d$ is omitted.)
+\begin{equation}
+    \Phi^{n+1/2}_{f}[0] = \left\{
+    \begin{array}{cc}
+         \Tilde{\Phi_f}[0]\ \ &u^{n+1/2}_f<0\\
+         \Tilde{\Phi_f}[-1]\ \ &u^{n+1/2}_f>0\\
+         \frac{1}{2}(\Tilde{\Phi_f}[0]+\Tilde{\Phi_f}[-1])\ \ &u^{n+1/2}_f=0
+    \end{array}
+    \right.
+    \label{equ:upwindfinal}
+\end{equation}
+where $u_f$ is velocity on the same face and marker $[0],[-1]$ indicate the cell from which the face value is obtained. In mesh system of Basilisk, for face located at $(i-1/2,j)$ the $[0]$ (resp. $[-1]$) represents cell positioned at $(i,j)$ (resp. $(i-1,j)$). It is worth mentioning that the marker in current equation is associated with the direction. For example, if one calculates face value $\Phi_f^{n+1/2}$ on $x$ direction, the marker in equation \ref{equ:upwindfinal} indicates the relationship on $x$ direction while those in equation \ref{equ:upwind2} refers to relation on $y$ direction. Above discussion is the original algorithm on the paper, compensation is made in real code which shall be introduced in the following sections.
 \section{Functions}
 
 \subsection{\func{tracer\_fluxes}}
-
+Given face velocity $u^{n+1/2}_f$, the face flux $u_{f}^{n+ \frac{1}{2}}\Phi_{f}^{n + \frac{1}{2}}$ is computed and stored on staggered mesh.
 \subsubsection{Parameters}
 \begin{center}
   \begin{tabular}{|c|c|c|c|c|}
@@ -102,67 +136,60 @@ Compromise is taken for sake of convenience (maybe) that $ \mathbf{u}^n$ in equa
     \hline\hline
     \para{f} & scalar & unchanged & compulsory & $\Phi^n$\\
     \hline
-    \para{uf} & face vector & unchanged & compulsory & $u_d^{n+ \frac{1}{2}}$\\
+    \para{uf} & face vector & unchanged & compulsory & $u_f^{n+ \frac{1}{2}}$\\
     \hline
-    \rowcolor{output} \para{flux} & face vector & \textbf{output} & compulsory & $u_d^{n+ \frac{1}{2}}\Phi_d^{n+\frac{1}{2}}$\\
+    \rowcolor{output} \para{flux} & face vector & \textbf{output} & compulsory & $u_f^{n+ \frac{1}{2}}\Phi_f^{n+\frac{1}{2}}$\\
     \hline
     \para{dt} & double & unchanged & compulsory & $\Delta t$\\
     \hline
-    \para{src} & scalar & unchanged & compulsory & $ \mathbf{g}^n$ \\
+    \para{src} & scalar & unchanged & compulsory & $ a^n$ \\
     \hline
   \end{tabular}
 \end{center}
 
 \subsubsection{Worth Mentioning Details}\label{sec:tracerdetail}
-Data of \emph{face vector} type is stored on staggered mesh\cite{harlow1965numerical}. Take \para{uf} as an example, the storage on a 2D cell displays in Fig.\ref{fig:staggered}.
+As discussed previously, specific face value on staggered mesh\cite{1965_Harlow} can be located by its spatial relation with corresponding cell. Take cell at $(i,j)$ as an example, figure \ref{fig:staggered} demonstrates notation of each face. Moreover such value can be iterated by calling macro $foreach\_face()$ in Basilisk. Thanks to this feature, the code can be constructed from face-perspective starting from equation \ref{equ:upwindfinal} rather than iterating every cell and compare two values for single faces.\par
+Notably, different from original algorithm, two compensations are made in performing equation \ref{equ:upwindfinal} and equation \ref{equ:upwind} respectively. For the former one, the condition where $u_f^{n+1/2}=0$ merges into the second condition, the filter now reads:
+\begin{equation}
+    \Phi^{n+1/2}_{f}[0] = \left\{
+    \begin{array}{cc}
+         \Tilde{\Phi_f}[0]\ \ &u^{n+1/2}_f<0\\
+         \Tilde{\Phi_f}[-1]\ \ &u^{n+1/2}_f\geq0
+    \end{array}
+    \right.
+    \label{equ:upwindfinal2}
+\end{equation}
+For the latter one, $u_d$ is replaced by face value $u_f[]$ for simplicity in boundary condition settings. Consequently the upwind filter (i.e. the $max()$) is no longer needed in the second term of equation \ref{equ:upwind} since upwind scheme is automatically met owing to upwind selection originally conducted by equation \ref{equ:upwindfinal2}. 
+
 \begin{figure}[H]
      \centering
      \begin{center}
      \begin{tikzpicture}[scale=1]
      \draw (-2,0)--(2,0)--(2,4)--(-2,4)--(-2,0);
-     \draw[->] (0,-0.25)--(0,0.75) node[anchor=west]{ $uf_{y}[i]$ };
-     \draw[->] (-2.25,2.0)--(-1.25,2.0) node[anchor=west]{ $uf_x[i]$ };
-     \draw[->] (0,3.75)--(0,4.75) node[anchor=west]{ $uf_{y}[i+1]$ };
-     \draw[->] (1.75,2)--(2.75,2) node[anchor=west]{ $uf_x [i+1]$ };
+     \node at (0,0) [anchor=north]{ $\Phi.y[i]$ };
+     \node at (-2,2) [anchor=west]{ $\Phi.x[i]$ };
+     \node at (2,2) [anchor=west]{ $\Phi.x[i+1]$ };
+     \node at (0,4) [anchor=north]{ $\Phi.y[i+1]$ };\
+     \node at (0,2) {$[i,j]$};
      \end{tikzpicture}
      \end{center}
-     \caption{Staggered mesh.}
+     \caption{Example of staggered mesh.}
      \label{fig:staggered}
 \end{figure}
-Components are saved in corresponding face with single value. The direction of the component express itself in the feature of the cell face. Therefore, $ \mathbf{u}^{n + \frac{1}{2}} \cdot \mathbf{n}_x$ can simply be $ \frac{1}{2}(uf_x[i]+uf_x[i+1])$.\par
-Advection term employs BCG scheme\cite{martin2000cell}, a second order upwinded scheme. It first requires face-centered approximation of velocity $u_d^n,v_e^n(w_f^n)$. Then equation \ref{equ:taylor} is adapted to a upwinded scheme
-\begin{equation}
-  \Phi_d^{n+ \frac{1}{2}}=
-    \left \{ 
-    \begin{array}{cc}
-      \bar{\Phi}^{L,n+ \frac{1}{2}}_d\quad &if\, u_d^n>0,\\
-      \bar{\Phi}^{R,n+ \frac{1}{2}}_d\quad &if\, u_d^n<0,\\
-      \frac{1}{2}(\bar{\Phi}^{L,n+ \frac{1}{2}}_d+\bar{\Phi}^{R,n+ \frac{1}{2}}_d)\quad &if \,u_d^n=0.
-    \end{array}
-    \right.
-\end{equation}
-where
-\begin{align}
-  \bar{\Phi}^{L,n+ \frac{1}{2}}_d &= \Phi^n[i] + \frac{\Delta}{2}min[1- \frac{\Delta t}{2\Delta}(u_d^n[i]+u_d^n[i+1]),1] \frac{\partial \Phi}{\partial x_d}[i]- \frac{\Delta t}{2} \mathbf{g}^n-flux_e[i]\\
-  \bar{\Phi}^{R,n+ \frac{1}{2}}_d &= \Phi^n[i+1] - \frac{\Delta}{2}min[1- \frac{\Delta t}{2\Delta}(u_d^n[i]+u_d^n[i+1]),1]\frac{\partial \Phi}{\partial x_d}[i+1]- \frac{\Delta t}{2} \mathbf{g}^n-flux_e[i+1]
-\end{align}
-$flux_e$ represents contribution from direction other than $d$, which also takes upwinded scheme
-\begin{equation}
-    flux_e = \frac{\Delta t}{2} \mathbf{u}^n\cdot\mathbf{n}_e \frac{\partial \Phi^n}{\partial x_e}=\left \{ 
-    \begin{array}{cc}
-      \frac{\Delta t}{2\Delta} v_{e}^{trans}(u^n[i,j]-u^n[i,j-1])\quad if\,v_{e}^{trans}>0,\\
-      -\frac{\Delta t}{2\Delta} v_e^{trans}(u^n[i,j]-u^n[i,j+1])\quad if\,v_e^{trans}<0.
-    \end{array}
-    \right.
-\end{equation}
-where $v_e^{trans} = \frac{1}{2}(v_e^{trans}[i,j]+v_e^{trans}[i,j+1])$
+Given $u_f^{n+1/2}$, the procedure to compute face flux now becomes:
+\begin{enumerate}
+    \item Identify the upstream direction based on $u_f^{n+1/2}$.
+    \item Choose corresponding cell to compute face flux based on equation \ref{equ:upwindfinal} and upstream direction obtained in previous step.
+    \item According to equation \ref{equ:upwind} \ref{equ:upwind2}, add contribution from each direction and multiply the result by $u_f^{n+1/2}$ to obtain $u_f^{n+1/2}\Phi_f^{n+1/2}$.
+\end{enumerate}
+Yet another detail worth mentioning is the source term $a^n$ in current function. This is indeed preparation for solving non-Euler equation such as NS equation in 'centered.h'. Albeit compulsory here, such term is overall optional in the final function \func{advection} which shall be introduced in the upcoming section.
 \subsubsection{Program Workflow}
 \begin{multicols}{2}
   \begin{tikzpicture}
     \node [block](init){
         \textbf{Starting Point}\\
         \textbf{input}: \\
-        \para{f} = $\Phi^n$ \para{uf} = $u_d^{n+ \frac{1}{2}}$\\ \para{flux}(empty) \para{dt}=$\Delta t$\\ \para{src} = $ \mathbf{g}^n$\\
+        \para{f} = $\Phi^n$ \para{uf} = $u_f^{n+ \frac{1}{2}}$\\ \para{flux}(empty) \para{dt}=$\Delta t$\\ \para{src} = $ \mathbf{g}^n$\\
         \textbf{gradient}:\\
         \para{g} = $\nabla$ \para{f} = $\nabla \Phi$
       };
@@ -190,12 +217,11 @@ void tracer_fluxes (scalar f,
 \begin{multicols}{2}
   \begin{tikzpicture}
     \node [block](init){
-        \textbf{Main Direction}\\
-        Traversal all directions, suppose current direction is $d$\\
-        \textbf{compute un}\footnote{Subscript $*p$ refers to positive normal unit whose direction agrees with coordinate positive direction. See \ref{sec:direction} for more information.}: \\
-        \para{un}=$ \frac{\Delta t}{\Delta}\mathbf{u}^{n+ \frac{1}{2}}\cdot \mathbf{n}_{dp}$\\=$ \frac{\Delta t}{2\Delta}(uf_d[i]+uf_d[i+1])/(fm.d[i]+fm.d[i+1])$\\ $\approx  \frac{\Delta t}{\Delta} \frac{uf_x[i]}{fm.x[i]}$\\
-        \textbf{component of main direction}\footnote{See \ref{sec:tracerdetail} for details about upwinded }:\\
-        \para{f2} = $\Phi^n + \frac{\Delta}{2}upwind[1- \frac{\Delta t}{\Delta} \mathbf{u}^{n+\frac{1}{2}}\cdot \mathbf{n}_{dp},-1-\frac{\Delta t}{\Delta} \mathbf{u}^{n+\frac{1}{2}}\cdot \mathbf{n}_{dp}] \frac{\partial \Phi^n}{\partial x_d}+\frac{\Delta t}{2}\mathbf{g}_d^n$ 
+        \textbf{compute un}\footnote{A compensation is made here, see \ref{sec:tracerdetail} for detailed information}: \\
+        \para{un}=$\frac{u_{f,d}^{n+1/2}\Delta t}{fm.x[i]\Delta}$\\
+        \textbf{Identification of upstream direction}\\
+        The notation of corresponding cell \para{i} is identified according to equation \ref{equ:upwindfinal2}.
+        \para{s} = $s_d$\\
       };
   \end{tikzpicture}
   \columnbreak
@@ -203,7 +229,7 @@ void tracer_fluxes (scalar f,
   foreach_face() {
     double un = dt*uf.x[]/(fm.x[]*Delta + SEPS), s = sign(un);
     int i = -(s + 1.)/2.;
-    double f2 = f[i] + (src[] + src[-1])*dt/4. + s*(1. - s*un)*g.x[i]*Delta/2.;
+
   \end{minted}
 \end{multicols}
 
@@ -216,17 +242,22 @@ void tracer_fluxes (scalar f,
 \begin{multicols}{2}
   \begin{tikzpicture}
     \node [block](init){
-        \textbf{Other Directions}\\
-        Traversal the rest directions, suppose current direction is $e,e\neq d$\\
-        \textbf{compute vn,wn}: \\
-        \para{vn}(\para{wn})=$\mathbf{u}^{n+ \frac{1}{2}}\cdot \mathbf{n}_{ep}$\\=$(uf_e[i]+uf_e[i+1])/(fm.e[i]+fm.e[i+1])$\\
+        \textbf{Contribution of Each Direction}\\
+        \textbf{Main direction}\\
+        \para{f2} = $\Phi^n[i] + \frac{\Delta}{2}[s_d- \frac{\Delta t}{\Delta}u_{f,d}^{n+1/2}] \frac{\partial \Phi^n}{\partial x_d}[i]$\\
+        $+\frac{\Delta t}{2}\frac{a^n[-1]+a^n[0]}{2}$\\ 
+        \textbf{Traversal direction}\\
+        \textbf{compute $u_o$ in equation \ref{equ:upwind}}: \\
+        \para{vn}(\para{wn})=$(u^{n+1/2}_{f,o}[i,0]+u^{n+1/2}_{f,o}[i,1])/(fm.e[i,0]+fm.e[i,1])$\\
         \textbf{component of other direction}:\\
-        \para{fyy}(\para{fzz})= $\frac{\partial \Phi^n}{\partial x_e}\cdot \Delta$\\
-        \para{f2} -= $ \frac{\Delta t}{2} \mathbf{u}^n\cdot \mathbf{n}_{ep} \frac{\partial \Phi^n}{\partial x_e}$ 
+        The gradient $\overline{\frac{\partial \Phi^n}{\partial x_o}}$ is first computed by upwind scheme based on direction of $u_o$ according to equation \ref{equ:upwind2}\\
+        \para{fyy}(\para{fzz})= $\overline{\frac{\partial \Phi^n}{\partial x_o}}$\\
+        \para{f2} -= $\frac{\Delta t}{2} u_o \overline{\frac{\partial \Phi^n}{\partial x_o}}$ 
       };
   \end{tikzpicture}
   \columnbreak
   \begin{minted}{cpp}
+    double f2 = f[i] + (src[] + src[-1])*dt/4. + s*(1. - s*un)*g.x[i]*Delta/2.;
     #if dimension > 1
     if (fm.y[i] && fm.y[i,1]) {
       double vn = (uf.y[i] + uf.y[i,1])/(fm.y[i] + fm.y[i,1]);
@@ -255,7 +286,8 @@ void tracer_fluxes (scalar f,
     \node [block](init){
         \textbf{Assemble}\\
         assemble the final result, current direction is $d$\\
-        \para{flux.d}=$u_d^{n+ \frac{1}{2}}\Phi_d^{n+ \frac{1}{2}}$
+        \para{flux.d}=$u_{f,d}^{n+ \frac{1}{2}}\Phi_{f,d}^{n+ \frac{1}{2}}$\\
+        after the $foreach\_face$ macro, the face flux on every face is obtained.
       };
   \end{tikzpicture}
   \columnbreak
