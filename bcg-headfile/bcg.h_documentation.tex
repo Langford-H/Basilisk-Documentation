@@ -132,7 +132,7 @@ Given face velocity $u^{n+1/2}_f$, the face flux $u_{f}^{n+ \frac{1}{2}}\Phi_{f}
 \begin{center}
   \begin{tabular}{|c|c|c|c|c|}
     \hline
-    Name & Data type & Status & Option & Representation (before/after)\\[0.5ex]
+    Name & Data type & Status & Option/Default & Representation (before/after)\\[0.5ex]
     \hline\hline
     \para{f} & scalar & unchanged & compulsory & $\Phi^n$\\
     \hline
@@ -299,55 +299,42 @@ void tracer_fluxes (scalar f,
 \end{multicols}
 
 \subsection{\func{advection}}
-
+Given face flux $u^{n+1/2}_f\Phi^{n+1/2}_f$, compute $\Phi^{n+1} = \Phi^n-\Delta t A^{n+1/2}$.
 \subsubsection{Parameters}
 \begin{center}
   \begin{tabular}{|c|c|c|c|c|}
     \hline
-    Name & Data type & Status & Option & Representation (before/after)\\[0.5ex]
+    Name & Data type & Status & Option/Default & Representation (before/after)\\[0.5ex]
     \hline\hline
     \rowcolor{output} \para{tracers} & scalar* & update & compulsory & $\Phi^n$/ $\Phi^n-\Delta t A^{n+ \frac{1}{2}}$\\
     \hline
-    \para{u} & face vector & unchanged & compulsory & $u_d^{n+ \frac{1}{2}}$\\
+    \para{u} & face vector & unchanged & compulsory & $u_f^{n + \frac{1}{2}}$\\
     \hline
     \para{dt} & double & unchanged & compulsory & $\Delta t$\\
     \hline
-    \para{src} & scalar* & unchanged & optional & $ \mathbf{g}^n$ \\
+    \para{src} & scalar* & unchanged & optional/NULL & $ \mathbf{g}^n$ \\
     \hline
   \end{tabular}
 \end{center}
 
 \subsubsection{Worth Mentioning Details}\label{sec:direction}
-The input of this function (\para{tracers},\para{src}) can be $vector$ type, e.g. $\mathbf{u}$, where components of each direction is deemed as $scalar$ type data then is finally assembled as a $vector$.\par
-Another thing needs to be concerned is the direction of the normal unity associates with coordinate axis. Positive direction of coordinate remains unchanged will face normal direction varies with respect to current cell. Take Fig.\ref{fig:facenormal} as an example. 
-\begin{figure}[H]
-  \centering
-    \begin{tikzpicture}[scale=1]
-    \draw[->] (-3,0) -- (3,0) node[anchor=north west] {x};%画出x轴并将最后的终结点其命名为x
-    \draw[->] (0,-1) -- (0,3) node[anchor=south east] {y};%画出y轴并将最后的终结点其命名为y
-    \draw[very thick,red]
-        (0,0) -- (0,2.5);%在线段的中间添加标签，并使用fill = white使线条不透过标签
-    \draw (-2.5,0) -- (-2.5,2.5)--(2.5,2.5)--(2.5,0);
-    \fill [color = red] (0,1.25) circle (2pt) ;
-    \fill (1.25,1.25) circle (2pt) node[above=2pt,fill=white]{$A$};
-    \fill (-1.25,1.25) circle (2pt) node[above=2pt,fill=white]{$B$};
-    \end{tikzpicture}
-    \caption{Face normal example.}
-    \label{fig:facenormal}
-\end{figure}
-For cell $A$, direction of highlighted face is opposite to coordinate while positive for that of cell $B$. For the sake of clarity and convenience, all value involved compute in function \func{tracer\_fluxes} take default positive direction. Which means for further computation for $\sum_{i=d}u_d^{n+ \frac{1}{2}}\Phi_d^{n+ \frac{1}{2}}$ of cell $A$, the value added at highlighted face should take negative value reads 
+The data type $scalar*$ indicates the input can be vector, and each components will be treated as $scalar$ type data and are assembled into one $vector$ data eventually.\par
+Given the face flux $u^{n+1/2}_f \Phi^{n+1/2}_f$, according to equation \ref{equ:aim}, for each cell the $\Phi^{n+1}$ yielding:
 \begin{equation}
-  u_d^{n+ \frac{1}{2}}\Phi_d^{n + \frac{1}{2}}(i)+u_d^{n+ \frac{1}{2}}\Phi_d^{n + \frac{1}{2}}(i+1) = -flux.x[i]+flux.x[i+1]
+    \Phi^{n+1} = \Phi^n-\Delta t \sum_{d} s_d u_{f,d}^{n+ \frac{1}{2}}\Phi_{f,d}^{n + \frac{1}{2}}
+\end{equation}
+take $flux = u^{n+1/2}_f \Phi^{n+1/2}_f$ for cell located at $(i,j)$ the above equation reads
+\begin{equation}
+    \Phi^{n+1}[i,j] = \Phi^n[i,j] + \Delta t (flux.x[i] - flux.x[i+1] + flux.y[j] - flux.y[j+1])
 \end{equation}
 
-\newpage
 \subsubsection{Program Workflow}
 \begin{multicols}{2}
   \begin{tikzpicture}
-    \node [block](init){
+    \node [block]{
         \textbf{Starting Point}\\
         \textbf{input}: \\
-        \para{tracers} = $\Phi^n$ \para{u} = $u_d^{n+ \frac{1}{2}}$\\ \para{dt}=$\Delta t$ \para{src} = $ \mathbf{g}^n$\\
+        \para{tracers} = $\Phi^n$ \para{u} = $u_f^{n+ \frac{1}{2}}$\\ \para{dt}=$\Delta t$ \para{src} = $ a^n$\\
       };
   \end{tikzpicture}
   \columnbreak
@@ -380,7 +367,7 @@ For cell $A$, direction of highlighted face is opposite to coordinate while posi
         \textbf{Fluxes Compute}\\
         Traversal each elements in \para{tracers} (if \para{tracers} is vector, then this step traversal component on every direction)\\
         \textbf{computation}: \\
-        \para{flux} = $\Phi^{n+ \frac{1}{2}}_d u_d^{n+ \frac{1}{2}}$\\
+        \para{flux} = $\Phi_f^{n + \frac{1}{2}} u_f^{n + \frac{1}{2}}$\\
       };
   \end{tikzpicture}
   \columnbreak
@@ -398,14 +385,13 @@ For cell $A$, direction of highlighted face is opposite to coordinate while posi
   \end{tikzpicture}
 \end{center}
 
+\newpage
 
 \begin{multicols}{2}
   \begin{tikzpicture}
     \node [block](init){
         \textbf{Update}\\
-        \para{tracers}(updated) = $\Phi^{n+1}$ = $\Phi^n-\Delta t A^{n+ \frac{1}{2}}$\\
-        = $\Phi^n- \Delta t \sum u_d^{n+ \frac{1}{2}}\Phi_d^{n + \frac{1}{2}}$
-        = $f[] + \Delta t \sum_{each\_di} (flux.d[i]-flux.d[i-1])$
+        \para{tracers}(updated) = $\Phi^{n+1}[i,j] = \Phi^n[i,j] + \Delta t (flux.x[i] - flux.x[i+1] + flux.y[j] - flux.y[j+1])$
       };
   \end{tikzpicture}
   \columnbreak
@@ -427,7 +413,6 @@ For cell $A$, direction of highlighted face is opposite to coordinate while posi
 
 \appendix
 \section{Calculation of Face Centered Normal Velocity}
-It can be seen from \ref{sec:intro}, the computation of face centered normal velocity $u_d^{n+ \frac{1}{2}}$ is of great importance to construct advection term. The detailed procedure of extrapolation is shown in documentation of \textbf{centered.h}. The output of such variable follows a similar step as equation \ref{equ:taylor} but without pressure term since the face centered velocity will be projected with an edge-centered projection. This additional projection ensures the feature of conservative of corresponding method.\par
-When it comes to the resolution of NS equation, $\Phi$ in governing equation \ref{equ:aim} is the cell-centered vector $ \mathbf{u}^n$. According to Martin\cite{martin2000cell}, normal components calculated by equation \ref{equ:taylor} can simply be replaced by $u_d^{n+ \frac{1}{2}}$, which means we only need to compute tangential fluxes. However, after series of tests, reuse of normal fluxes will lead to unstable at sharp angles. Thus all components is recomputed in Basilisk\cite{popinet2003gerris}.
+Readers may find all the algorithms constructed in this headfile are based on one condition: $u_f^{n+1/2}$ are known. In fact when solving a NS equation, the face velocity $u_f^{n+1/2}$ is obtained in a similar method (i.e. BCG scheme) in the NS solver before calling the functions discussed in current doc\cite{2003_popinet}. The difference majorly manifests in two perspectives: 1) the criteria in equation \ref{equ:upwindfinal2} becomes face velocity computed by center scheme from adjacent cell-centered value and $u_o$ in equation \ref{equ:upwind2} is the cell-centered value; 2) the obtained face velocity is projected to satisfy no-divergence condition. The detailed discussion will be presented in documentation for 'centered.h'.
 \printbibliography
 \end{document}
