@@ -61,7 +61,7 @@
     \vskip 1em%
     {\large \@date\par}%
     \vskip 1em%
-    {\large version:1.0}%
+    {\large version: 2.0}%
   \end{center}%
   \par
   \vskip 1.5em}
@@ -226,7 +226,7 @@ By contrary \func{orientation} returns surface orientation based on height value
 \subsubsection{Workflow}
 \begin{multicols}{2}
   \begin{tikzpicture}
-    \node [block](init){
+    \node [block]{
         \func{height}\\
         The disguise value \para{HSHIFT} is $20$. By adding/removing such value, true interfacial distancne is revealed. 
       };
@@ -243,7 +243,7 @@ static inline double height (double H) {
 
 \begin{multicols}{2}
   \begin{tikzpicture}
-    \node [block](init){
+    \node [block]{
         \func{orientation}\\
         return TRUE or FALSE based on disguise value. Two layers of ghost value is set on every boundaries.
       };
@@ -338,7 +338,7 @@ While the $-0.5$ stems from the fact that height value of one cell is determined
 
         \draw[very thick, red](-1,0)--(-1,1)--(0,1)--(0,0)--cycle;
 
-        \foreach \x in {-3.5,-2.5,4.5}
+        \foreach \x in {-3.5,-2.5}
         {
           \filldraw[] (\x,0.5) circle (1.5pt);
         }
@@ -349,6 +349,7 @@ While the $-0.5$ stems from the fact that height value of one cell is determined
         \node at (1.5,0.5) {\LARGE$D$};
         \node at (2.5,0.5) {\LARGE$E$};
         \node at (3.5,0.5) {\LARGE$F$};
+        \node at (4.5,0.5) {\LARGE$G$};
 
         \draw[thick,-latex] (-1,1.5)--(2,1.5) node[above,midway] {surface direction};
     \end{tikzpicture}
@@ -415,9 +416,9 @@ Final height value $\para{h[]}$ therefore assigned according to $(\para{stats.s}
 \subsubsection{Program Workflow}
 \begin{multicols}{2}
   \begin{tikzpicture}
-    \node [block](init){
-        \textbf{First Layer}\\
-        \textbf{initial}:\\
+    \node [block]{
+        \textbf{1. First Layer}\\
+        \textbf{A. initial}:\\
         \para{S} = $f$ \para{H} = $f$, \para{ci} and \para{a} are employed in the second layer. Note every dimension is iterated to obtained \para{h.x}, \para{h.y} and \para{h.z}.
       };
   \end{tikzpicture}
@@ -440,9 +441,9 @@ static void half_column (Point point, scalar c, vector h, vector cs, int j)
 
 \begin{multicols}{2}
   \begin{tikzpicture}
-    \node [block](init){
-        \textbf{First Layer}\\
-        \textbf{decode1}:\\
+    \node [block]{
+        \textbf{1. First Layer}\\
+        \textbf{B. decode1}:\\
         If the condition is incosistent (condition \Romannum{4}), the status is recorded as $\para{state.h}=-1$ and begin a new iteration.
       };
   \end{tikzpicture}
@@ -466,9 +467,9 @@ static void half_column (Point point, scalar c, vector h, vector cs, int j)
 
 \begin{multicols}{2}
   \begin{tikzpicture}
-    \node [block](init){
-        \textbf{First Layer}\\
-        \textbf{decode2}:\\
+    \node [block]{
+        \textbf{1. First Layer}\\
+        \textbf{C. decode2}:\\
         Cases except condition \Romannum{4} will be decode accordingly.\\
         \textbf{Note since \para{s} is defined as integer}, only cases whose $\para{h[]}\geq 90$, i.e. condition \Romannum{2} and \Romannum{3} in figure \ref{fig:column}, can obtain non-zero \para{s} then restoring previous status as initial condition $(\para{S},\para{H})=(\para{state.s},\para{state.h})$. Otherwise (condition \Romannum{3}) the iteration begins with original initial.
       };
@@ -496,9 +497,9 @@ static void half_column (Point point, scalar c, vector h, vector cs, int j)
 
 \begin{multicols}{2}
   \begin{tikzpicture}
-    \node [block](init){
-        \textbf{Second Layer}\\
-        \textbf{iteration A}:\\
+    \node [block]{
+        \textbf{2. Second Layer}\\
+        \textbf{A. iteration A}:\\
         Scanning over 4 neighborhood cells. If $1>\para{S}>0$ and meet an empty or full cell ($\para{ci}=0$ or $\para{ci}=1$), \para{S} first updated accordingly then modifying \para{H} according to its position against 0 position.
       };
   \end{tikzpicture}
@@ -526,11 +527,11 @@ static void half_column (Point point, scalar c, vector h, vector cs, int j)
 
 \begin{multicols}{2}
   \begin{tikzpicture}
-    \node [block](init){
-        \textbf{Second Layer}\\
-        \textbf{iteration B}:\\
+    \node [block]{
+        \textbf{2. Second Layer}\\
+        \textbf{B. iteration B}:\\
         For those whose current cell is full and find empty cell, the iteration stops and \para{S} switches to complete. Height value is computed as discussed before.\\
-        \textbf{iteration C}:\\
+        \textbf{C. iteration C}:\\
         For those whose current cell is empty and find full cell in iteration.
       };
   \end{tikzpicture}
@@ -557,9 +558,9 @@ static void half_column (Point point, scalar c, vector h, vector cs, int j)
 
 \begin{multicols}{2}
   \begin{tikzpicture}
-    \node [block](init){
-        \textbf{Second Layer}\\
-        \textbf{iteration D}:\\
+    \node [block]{
+        \textbf{2. Second Layer}\\
+        \textbf{D. iteration D}:\\
         For those have scanned over surface cell but never penetrate and find coherent surface, the iteration will stop right away.
       };
   \end{tikzpicture}
@@ -579,11 +580,11 @@ static void half_column (Point point, scalar c, vector h, vector cs, int j)
 
 \begin{multicols}{2}
   \begin{tikzpicture}
-    \node [block](init){
-        \textbf{Third Layer}\\
-        \textbf{encode A}:\\
+    \node [block]{
+        \textbf{3. Third Layer}\\
+        \textbf{A. encode A}:\\
         Incosistent surface i.e. condition \Romannum{4} encode with $\para{h[]=300}$.\\
-        \textbf{encode B}:\\
+        \textbf{B. encode B}:\\
         Complete cases i.e. condition \Romannum{3} assign \para{h[]} directly as \para{H}.
       };
   \end{tikzpicture}
@@ -607,9 +608,9 @@ static void half_column (Point point, scalar c, vector h, vector cs, int j)
 
 \begin{multicols}{2}
   \begin{tikzpicture}
-    \node [block](init){
-        \textbf{Third Layer}\\
-        \textbf{encode C}:\\
+    \node [block]{
+        \textbf{3. Third Layer}\\
+        \textbf{C. encode C}:\\
         Partial height (condition \Romannum{1} and \Romannum{2}) is encoded depending on whether empty of full cell they have found.\\
       };
   \end{tikzpicture}
@@ -629,9 +630,9 @@ static void half_column (Point point, scalar c, vector h, vector cs, int j)
 
 \begin{multicols}{2}
   \begin{tikzpicture}
-    \node [block](init){
-        \textbf{Third Layer}\\
-        \textbf{output 1}:\\
+    \node [block]{
+        \textbf{3. Third Layer}\\
+        \textbf{D. output 1}:\\
         For certain situation \para{states.s} and \para{states.h} are updated. See section \ref{sec:thirdl} for details.\\
       };
   \end{tikzpicture}
@@ -654,9 +655,9 @@ static void half_column (Point point, scalar c, vector h, vector cs, int j)
 
 \begin{multicols}{2}
   \begin{tikzpicture}
-    \node [block](init){
-        \textbf{Third Layer}\\
-        \textbf{output 2}:\\
+    \node [block]{
+        \textbf{3. Third Layer}\\
+        \textbf{E. output 2}:\\
         Output \para{h[]} given \para{states.s} and \para{states.h}.\\
       };
   \end{tikzpicture}
@@ -670,6 +671,127 @@ static void half_column (Point point, scalar c, vector h, vector cs, int j)
   }
 }
  \end{minted}
+\end{multicols}
+
+\subsection{\func{column\_propagation}}
+Function \func{column\_propagation} serves as supplement of \func{half\_column} which allocates height value to those located within $5.5R$ from the 0 position but gain $nodata$ from \func{half\_column}. Take cell $G$ in figure \ref{fig:hvcomp} as an example, such cell is indeed valid and should be assigned with $-3.8$ as its height value. However, owing to failure of finding coherent surface in its four neighbors, the cell is actually assigned with $nodata$. \func{column\_propagation} is therefore built for tackling such issue.
+\subsubsection{Parameters}
+\begin{center}
+  \begin{tabular}{|c|c|c|c|c|}
+    \hline
+    Name & Data type & Status & Option/Default & Representation (before/after)\\[0.5ex]
+    \hline\hline
+    \rowcolor{output}\para{h} & vector & \textbf{update} & compulsory & $\mathbf{h}$\\
+    \hline
+  \end{tabular}
+\end{center}
+\subsubsection{Worth Mentioning Details}
+Similar to the process in \func{half\_column}, current function will iterate two neighbors in both directions and update height value base on spatial relation with the smallest height cell.
+\subsubsection{Program Workflow}
+\begin{multicols}{2}
+  \begin{tikzpicture}
+    \node [block]{
+        \textbf{Propagation}\\
+        \textbf{A. input}:\\
+        \para{h} = $\mathbf{h}$\\
+        \textbf{B. propagation}\\
+        Finding in the four neighbors for valid height value, then updating the value on current cell. inline function \func{height} is called to reveal real distance against 0 position.
+      };
+  \end{tikzpicture}
+ \columnbreak
+ \begin{minted}{cpp}
+static void column_propagation (vector h)
+{
+  foreach (serial) // not compatible with OpenMP
+    for (int i = -2; i <= 2; i++)
+      foreach_dimension()
+	if (fabs(height(h.x[i])) <= 3.5 &&
+	    fabs(height(h.x[i]) + i) < fabs(height(h.x[])))
+	  h.x[] = h.x[i] + i;
+}
+ \end{minted} 
+\end{multicols}
+
+\subsection{\func{heights} for non-tree grid}
+As introduced in section \ref{sec:config}, \func{heights} serves as a controller over \func{half\_column} and \func{column\_propagation} to assign height value to valid cells. The non-tree grid version is first introduced which shares the same construction with tree grid version.
+
+\subsubsection{Parameters}
+\begin{center}
+  \begin{tabular}{|c|c|c|c|c|}
+    \hline
+    Name & Data type & Status & Option/Default & Representation (before/after)\\[0.5ex]
+    \hline\hline
+    \para{c} & scalar & unchanged & compulsory & color function $c$\\
+    \hline
+    \rowcolor{output}\para{h} & vector & \textbf{update} & compulsory & $\mathbf{h}$\\
+    \hline
+  \end{tabular}
+\end{center}
+
+\subsubsection{Worth Mentioning Details}
+Since there are only two cells for the boundary in default settings, an additional vector \para{s} is create to meet the need for iterating $4$ cells in both direction. In particular, the value stored in position $[x_0,y_0]$ for \para{s} is
+\begin{equation}\label{equ:translation}
+    s.x[x_0,y_0] = c[x_0+2j,y_0]
+\end{equation}
+where \para{j} is the parameter implies the direction (see figure \ref{fig:funcconfig}). Notably, each components of \para{s} indicates value translation of corresponding direction.
+
+\subsubsection{Program Workflow}
+\begin{multicols}{2}
+  \begin{tikzpicture}
+    \node [block]{
+        \textbf{1. Starting Point}\\
+        \textbf{A. input}:\\
+        \para{c} = $c$, \para{h} = $\mathbf{h}$\\
+        \textbf{B. boundary settings}\\
+        Make sure the boundary settings of \para{s} is the same as \para{c}\\
+        \textbf{C. direction iteration}\\
+        \para{j} represents current iterating direction for \para{j} = $-1$ (resp. $1$) indicating negative (resp. positive) direction.\\
+        \textbf{D. value assignment for \para{s}}\\
+        Implementation of equation \ref{equ:translation}.
+        
+      };
+  \end{tikzpicture}
+ \columnbreak
+ \begin{minted}{cpp}
+#if !TREE
+trace
+void heights (scalar c, vector h)
+{
+  vector s[];
+  foreach_dimension()
+    for (int i = 0; i < nboundary; i++)
+      s.x.boundary[i] = c.boundary[i];
+  for (int j = -1; j <= 1; j += 2) {
+    foreach()
+      foreach_dimension()
+        s.x[] = c[2*j];
+ \end{minted} 
+\end{multicols}
+
+\begin{center}
+  \begin{tikzpicture}
+    \draw[-latex,thick](0,0) -- (0,-1); 
+  \end{tikzpicture}
+\end{center}
+
+\begin{multicols}{2}
+  \begin{tikzpicture}
+    \node [block]{
+        \textbf{2. Height Value Assignment}\\
+        \textbf{E. \func{half\_column}}:\\
+        Assign height value for each cell on every direction.\\
+        \textbf{F. \func{column\_propagation}}\\
+        Propagate height value to ensure cells within $5.5R$ are equipped with valid height value.
+      };
+  \end{tikzpicture}
+ \columnbreak
+ \begin{minted}{cpp}
+    foreach (overflow)
+      half_column (point, c, h, s, j);
+  }
+  column_propagation (h);
+}
+ \end{minted} 
 \end{multicols}
 \printbibliography
 \end{document}
