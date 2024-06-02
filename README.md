@@ -13,7 +13,12 @@ The doc is written for those who are interested in how things work inside Basili
 		- [x] [bcg.h](./bcg-headfile/bcg_h_Documentation.pdf)
 
 - [] VOF multiphase solver
+	- [] two-phase-levelset.h
+		- [] redistance.h
+	- [] two-phase-clsvof.h
+		- [] tracer.h
 	- [] two-phase.h
+		- [] two-phase-generic.h
 		- [] vof.h
 			- [] fractions.h
 	- [] iforce.h
