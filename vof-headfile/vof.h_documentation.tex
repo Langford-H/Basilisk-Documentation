@@ -82,7 +82,7 @@
     \hline
     \para{point} & Point & unchanged & complusory & data index $[i,j]$\\
     \hline
-    \para{c} & scalar & unchanged & complusory & volume fraction $f$\\
+    \para{c} & scalar & unchanged & complusory & volume fraction $c$\\
     \hline
     \para{s} & scalar & unchange & complusory & $t$\\
     \hline
@@ -90,6 +90,67 @@
 \end{table}
 \subsubsection{Worth Mentioning Details}
 The gradient is calculated following a upwind-type two-point scheme when locates near the surface cell. In particular, such scheme is active if the volume fraction of only one adjacent cell is greater than $0.5$. Otherwise a central three point scheme is used. Notably, the gradient is valid only if there are at least two out of adjacent cells, including current one, has fraction volume greater than $0.5$.
+\subsubsection{Program Workflow}
+\begin{multicols}{2}
+  \begin{tikzpicture}
+    \node [block]{
+        \textbf{1. Starting Point}\\
+        \textbf{A. input}:\\
+        \para{point}: index information, $\para{c}=c$,  $\para{t}=t$\\
+        \textbf{B. adjacent value assignment}:\\
+        $\para{cl}=c[-1]$, $\para{cc}=c[]$, $\para{cr}=c[1]$\\
+        \textbf{C. inverse check}\\
+        To check in which phase the tracer exists.
+      };
+  \end{tikzpicture}
+ \columnbreak
+ \begin{minted}{cpp}
+foreach_dimension()
+static double vof_concentration_gradient_x (Point point, scalar c, scalar t)
+{
+  static const double cmin = 0.5;
+  double cl = c[-1], cc = c[], cr = c[1];
+  if (t.inverse)
+    cl = 1. - cl, cc = 1. - cc, cr = 1. - cr;
+ \end{minted}
+\end{multicols}
+
+\begin{center}
+  \begin{tikzpicture}
+    \draw[-latex,thick](0,0) -- (0,-1); 
+  \end{tikzpicture}
+\end{center}
+
+\begin{multicols}{2}
+  \begin{tikzpicture}
+    \node [block]{
+        \textbf{2. Gradient Compute}\\
+        \textbf{A. local value check}:\\
+        If $\para{cc}<0.5$, return $0$ otherwise checking \para{cr}.\\
+        \textbf{B. adjacent value check}:\\
+        Check value of \para{cr} then the value of \para{cl}. If both value less than \para{cmin} then returning $0$. If only one end is greater than \para{cmin}, compute baised gradient. Otherwise compute gradient using three-point scheme.
+      };
+  \end{tikzpicture}
+ \columnbreak
+ \begin{minted}{cpp}
+  if (cc >= cmin && t.gradient != zero) {
+    if (cr >= cmin) {
+      if (cl >= cmin) {
+	if (t.gradient)
+	  return t.gradient (t[-1]/cl, t[]/cc, t[1]/cr)/Delta;
+	else
+	  return (t[1]/cr - t[-1]/cl)/(2.*Delta);
+      }
+      else
+	return (t[1]/cr - t[]/cc)/Delta;
+    }
+    else if (cl >= cmin)
+      return (t[]/cc - t[-1]/cl)/Delta;
+  }
+  return 0.;
+}
+ \end{minted}
+\end{multicols}
 \subsection{\func{vof\_concentration\_refine}}
 \func{vof\_concentration\_refine} defines the prolongation formula of VOF-concentration $t$ when mesh is refined.
 \subsubsection{Parameters}
@@ -106,7 +167,7 @@ The gradient is calculated following a upwind-type two-point scheme when locates
   \end{tabular}
 \end{table}
 \subsubsection{Worth Mentioning Details}
-\begin{figure}
+\begin{figure}[!htbp]
     \centering
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
@@ -124,10 +185,74 @@ The gradient is calculated following a upwind-type two-point scheme when locates
     \label{fig:child}
 \end{figure}
 Basilisk employs $child$ index to indicate spatial relation between parent and child cells, as displayed in figure \ref{fig:child_a}, the child cells with greater $x$ (resp. $y$) coordinate are assigned with $child.x = 1$ (resp. $child.y = 1$) vice versa. When calling the macro $foreach_child$, Basilisk will automatically transversal every child cells and $child$ index is assigned with corresponding value. As indicated by figure \ref{fig:child_b}, given an active value, the prolongation is achieved by employing linear interpolation all the way to the center of child cell. Take 2D case as an example, the prolongation result $t_{child}$ is obtained by 
-\begin{equation}
-    t_{child} = f_{child}(\frac{t_{parents}}{f_{parents}} + \frac{\Delta}{4}(child.x\nabla_xt+child.y\nabla_yt))
+\begin{equation}\label{equ:prolongation}
+    t_{child} = c_{child}(\frac{t_{parents}}{c_{parents}} + \frac{\Delta}{4}(child.x\nabla_xt+child.y\nabla_yt))
 \end{equation}
-where $f$ is the fraction volume which is different for parent cell and child owing to reconstruction and $\Delta_xt,\Delta_yt$ are gradient computed by \func{vof\_concentration\_gradient} which has been detailed discussed in previous section.
+where $c$ is the fraction volume which is different for parent cell and child owing to reconstruction and $\Delta_xt,\Delta_yt$ are gradient computed by \func{vof\_concentration\_gradient} which has been detailed discussed in previous section.
+
+\subsubsection{Program Workflow}
+\begin{multicols}{2}
+  \begin{tikzpicture}
+    \node [block]{
+        \textbf{1. Starting Point}\\
+        \textbf{A. input}:\\
+        \para{point}: index information\\ $\para{s}=t$, 
+ ~$\para{f}=\para{s.c}=c$\\
+        \textbf{B. prolongation for void cells}:\\
+        If the current cell is void i.e. does not contains tracers, the prolongation is directly assigned as $0$.\\
+      };
+  \end{tikzpicture}
+ \columnbreak
+ \begin{minted}{cpp}
+#if TREE
+static void vof_concentration_refine (Point point, scalar s)
+{
+  scalar f = s.c;
+  if (cm[] == 0. || (!s.inverse && f[] <= 0.) || (s.inverse && f[] >= 1.))
+    foreach_child()
+      s[] = 0.;
+ \end{minted}
+\end{multicols}
+
+\begin{center}
+  \begin{tikzpicture}
+    \draw[-latex,thick](0,0) -- (0,-1); 
+  \end{tikzpicture}
+\end{center}
+
+\begin{multicols}{2}
+  \begin{tikzpicture}
+    \node [block]{
+        \textbf{2. Prolongation for Tracers}\\
+        \textbf{A. tracer gradient assign}:\\
+        $\para{g.d}=\Delta\cdot\nabla_dt,\ d = x,y(,z)$\\
+        \textbf{B. implement of equation \ref{equ:prolongation}}:\\
+        \textbf{a. first term of R.H.S.}\\
+        $\para{sc}=\para{s[]}=\frac{t_{parents}}{c_{parents}}$\\
+        \textbf{b. rest terms of R.H.S.}\\
+        $\para{s[]}=\para{s[]}+\frac{\Delta}{4}(child.d\cdot\para{g.d}),\ d = x,y(,z)$\\
+        \textbf{c. final assemble}\\
+        $\para{s[]}=c_{child}\cdot \para{s[]}$
+      };
+  \end{tikzpicture}
+ \columnbreak
+ \begin{minted}{cpp}
+  else {
+    coord g;
+    foreach_dimension()
+      g.x = Delta*vof_concentration_gradient_x (point, f, s);
+    double sc = s.inverse ? s[]/(1. - f[]) : s[]/f[], cmc = 4.*cm[];
+    foreach_child() {
+      s[] = sc;
+      foreach_dimension()
+	s[] += child.x*g.x*cm[-child.x]/cmc;
+      s[] *= s.inverse ? 1. - f[] : f[];
+    }
+  }
+}
+ \end{minted}
+\end{multicols}
+
 \section{Readme}
 Normally, a documentation would consist of two major parts: Introduction \& Backround and Function. The first part will introduce the purpose of the corresponding program and the governing equations it solved and other thing developers and users should be aware of \emph{e.g.} in which method the program solve the overall problem. Pragmatic program will be explored line by line in the second part. It first contains a table to clearify all the parameters and their physical representatives as shown in Table.\ref{tab:test}. 
 \begin{table}[h]
