@@ -19,8 +19,9 @@ The doc is written for those who are interested in how things work inside Basili
 		- [] tracer.h
 	- [] two-phase.h
 		- [] two-phase-generic.h
-		- [] vof.h
+		- [] [vof.h](./vof-headfile/vof_h_Documentation.pdf)
 			- [] fractions.h
+			- [] geometry.h
 	- [] iforce.h
 		- [] curvature.h
 			- [] [heights.h](./heights-headfile/heights_h_Documentation.pdf)
