@@ -68,8 +68,20 @@
 
 \maketitle
 \section{Introduction}
-\section{Function}
-\subsection{\func{vof\_concentration\_gradient}}
+\textbf{vof.h} aims to solve advection equation
+\begin{equation}\label{equ:advec}
+    \frac{\partial c_{i}}{\partial t} + \mathbf{u}\cdot\nabla c_{i} = 0
+\end{equation}
+where $c_{i}$ is the volume fraction.
+Additionally, Basilisk provides option to compute transport equation of diffusive tracer which is confined within specific phase e.g. ions in fluids whose governing equation reads\cite{2015_Lopez}
+\begin{equation}\label{equ:advectr}
+    \frac{\partial t_{i,j}}{\partial t} + \mathbf{u}\cdot\nabla t_{i,j} = 0
+\end{equation}
+where $t_{i,j}=f_{j} c_{i}$ or $tr=f_{j} (1-c_{i})$ depending on which side the tracer is confined. $f_{j}$ is the concentration of the tracer.\par
+The documentation is split into two parts: in the first part, the preparation to sovle the equation including gradient computation, prolongation in tree-grid and default event settings to implement prolongation are introduced. The solution of equation \ref{equ:advec} and \ref{equ:advectr} are carefully discussed in the second part.
+
+\section{Preparation}
+\subsection{\func{vof\_concentration\_gradient}}\label{sec:gradient}
 \func{vof\_concentration\_gradient} computes gradient for vof concentration using three-point scheme when given position is away from the surface and two-point scheme for those surface nearby cells.
 \subsubsection{Parameters}
 \begin{table}[h]
@@ -78,13 +90,13 @@
     \hline
     Name & Data type & Status & Option & Representation (before/after)\\[0.5ex]
     \hline\hline
-    \rowcolor{output} gradient & double & \textbf{output} & output & $\nabla t$\\
+    \rowcolor{output} gradient & double & \textbf{output} & output & $\nabla t_{i,j}$\\
     \hline
-    \para{point} & Point & unchanged & complusory & data index $[i,j]$\\
+    \para{point} & Point & unchanged & complusory & position index\\
     \hline
-    \para{c} & scalar & unchanged & complusory & volume fraction $c$\\
+    \para{c} & scalar & unchanged & complusory & volume fraction $c_{j}$\\
     \hline
-    \para{s} & scalar & unchange & complusory & $t$\\
+    \para{s} & scalar & unchange & complusory & $t_{i,j}$\\
     \hline
   \end{tabular}
 \end{table}
@@ -160,9 +172,9 @@ static double vof_concentration_gradient_x (Point point, scalar c, scalar t)
     \hline
     Name & Data type & Status & Option & Representation (before/after)\\[0.5ex]
     \hline\hline
-    \para{point} & Point & unchanged & complusory & data index $[i,j]$\\
+    \para{point} & Point & unchanged & complusory & position index\\
     \hline
-    \para{s} & scalar & unchange & complusory & $t$\\
+    \para{s} & scalar & unchange & complusory & $t_{i,j}$\\
     \hline
   \end{tabular}
 \end{table}
@@ -253,63 +265,160 @@ static void vof_concentration_refine (Point point, scalar s)
  \end{minted}
 \end{multicols}
 
-\section{Readme}
-Normally, a documentation would consist of two major parts: Introduction \& Backround and Function. The first part will introduce the purpose of the corresponding program and the governing equations it solved and other thing developers and users should be aware of \emph{e.g.} in which method the program solve the overall problem. Pragmatic program will be explored line by line in the second part. It first contains a table to clearify all the parameters and their physical representatives as shown in Table.\ref{tab:test}. 
+\section{Advection Solution}
+The exact solution is introduced in this section. Before diving into details, the conception of VOF method and major problem confronted in this method shall be discussed first.
+\subsection{VOF method}
+Generally speaking, there are two steps to accomplish VOF method i.e. advection of volume fraction and reconstruction of surface. The latter one is tackled in headfile \textbf{geometry.h} and will not be covered in this document.\par
+ The integral form of equation \ref{equ:advec} is
+\begin{equation}
+    \Delta^{d} c_i|^{n+1}_{n} + \int_{\Omega}\mathbf{u}_f\cdot\nabla c_i= 0
+\end{equation}
+where $\Delta^d$ stands for the area (volume) of the cell.
+Using divergence theorem the equation turns into
+\begin{equation}\label{equ:advec2}
+    \Delta^{d} c_i|^{n+1}_{n} + \int_{\partial\Omega}\mathbf{u}_f c_i - \int_{\Omega}c_i\nabla\cdot \mathbf{u}_f= 0
+\end{equation}
+the second term in equation \ref{equ:advec2} is the face flux $\mathbf{u}_fc_i=\mathbf{F}$. Consider the conservative constraint $\nabla\cdot\mathbf{u}=0$, the third term is supposed to vanish. However, as will be discussed later, such term plays a critical role in the overall algorithm.\par
+The advection is achieved by applying operator-split advection method\cite{2011_Gretar} wherein the volume fraction is transport in each dimension. Take 2D case as an example, equation \ref{equ:advec2} now reads
+\begin{align}
+    c_i^\ast = c_i^{n} - \frac{\Delta t}{\Delta}(\mathbf{F}_x[1]-\mathbf{F}_x[]) + \frac{\Delta t}{\Delta}\int_{\Omega}c_i\nabla_x\cdot\mathbf{u}_f\label{equ:advec3x}\\
+    c_i^{n+1} = c_i^\ast - \frac{\Delta t}{\Delta}(\mathbf{F}_y[1]-\mathbf{F}_y[]) + \frac{\Delta t}{\Delta} \int_{\Omega}c_i\nabla_y\cdot\mathbf{u}_f
+\end{align}
+Given interface and non-divergence face velocity $\mathbf{u}_f$ at $t^n$ assuming the time step between $t^{n}$ and $t^{n+1}$ is $\Delta t$, the very next step is to obtain the face flux $\mathbf{F}$. The sketch of advection for specific cell is demonstrated by figure \ref{fig:VOFadvection}. The gray area represents volume of fraction and corresponding interface.
+The face flux $\mathbf{F}$ is directly obtained by the gray area within dashed rectangle whose width is $\mathbf{u}_f\Delta t$. To avoid non-conservation induced by transporting overlapped area (the blue area in figure \ref{fig:VOFadvectiony}), reconstruction is applied between advection of every direction as indicated from shape changes between two figures.\par
+Yet there is still one constraint to satisfy: the volume fraction should be $0\leq c_i \leq1$ at any stage. However without additional care, such rule can be violated between direction switch. Take condition in figure \ref{fig:VOFadvectionx} as an example. Assume $c^n=0.9,u_f.x[]=0.3,u_f.x[1]=0.1$, for sake of simplicity the time step and cell width are set to be unity. Ignoring the third term in equation \ref{equ:advec3x}, $c^\ast = 1.1 > 1.0$ which of course break the constraint and leads to failure in surface reconstruction. An opposite condition may also occur where the volume fraction eventually becomes $c<0$.
+The dilation term (third term in equation \ref{equ:advec2}) is therefore introduced to cope with such issue\cite{2003_Scardovelli}.\par
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[height=5.5cm]{image/VOFadvectionx.pdf}
+        \subcaption{}
+        \label{fig:VOFadvectionx}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[height=5.5cm]{image/VOFadvectiony.pdf}
+        \subcaption{}
+        \label{fig:VOFadvectiony}
+    \end{subfigure}
+    \caption{Sketches for (a) advection on x direction (b) advection on y direction. The width of dashed rectangle is $\mathbf{u}_f\Delta t$}
+    \label{fig:VOFadvection}
+\end{figure}
+
+\subsubsection{The dilation term}
+Given the non-divergence of $\mathbf{u}_f$, the dilation term in equation \ref{equ:advec2} can be rewrite in discrete form as:
+\begin{equation}\label{equ:dilation}
+    \int_{\Omega}c_i\nabla\cdot\mathbf{u}_f = g\Delta^{d-1} \sum_d(u_f.d[1]-u_f.d[])
+\end{equation}
+where $g$ is an arbitrary value and can even vary in different cells or in different cycle of iteration. The main topic in this section is to find a proper form of $g$ which can help to overcome the overfull issue depicted previously.\par
+The condition where $g=0$ i.e. no dilation has been fully discussed, consider now the condition where $g=1$. Take condition in figure \ref{fig:dilation1} as an example. The volume fraction for current cell is $c^n = 1$, given the input face velocity on both faces, the overfull occurs without dilation term. However after adding the dilation, according to equation \ref{equ:advec3x} and \ref{equ:dilation} the input flux $\mathbf{F}$ (gray area confined by dashed rectangle) will be counteracted by dilation term (area of dashed rectangle when $g=1$). The difference between (blue area) prevents the overfull issue.\par
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[height=1.83cm]{image/dilation1.pdf}
+        \subcaption{}
+        \label{fig:dilation1}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[height=1.83cm]{image/dilation2.pdf}
+        \subcaption{}
+        \label{fig:dilation2}
+    \end{subfigure}
+    \caption{Sketch for dilation. The area highlighted by blue represents the area difference induced by adding dilation term}
+    \label{fig:dilation}
+\end{figure}
+Nevertheless, the dilation can be harmful at certain circumstance. As shown by figure \ref{fig:dilation2} where the volume fraction now becomes $c^n=0$, with input face velocity the dilation now promotes clipping ($c<0$) owing to area difference (blue area).
+\subsubsection{Coefficient $g$ and CFL number}
+Basilisk follows work by Weymouth and Yue\cite{2010_Weymouth} and sets coefficient $g$ as 
+\begin{equation}\label{equ:gcorrect}
+    g=c_c=\left\{
+    \begin{array}{cc}
+    1     &  c^n \geq 0.5\\
+    0     &  c^n <0.5
+    \end{array}
+    \right.
+\end{equation}
+with CFL number constraint $\sum_d \frac{\Delta t}{\Delta}|u_f.d|<0.5$ the method can preserve exact conservation.\par
+Following the same work, given $g$ in equation \ref{equ:gcorrect} the restriction for volume fraction reads
+\begin{align}
+    c\geq0.5\geq min(\frac{\Delta t}{\Delta} u_f[1],f)+\frac{\Delta t}{\Delta}(u_f[]-u_f[1]);&\  1-c\geq0.5\geq \frac{\Delta t}{\Delta}u_f[]-max(0,\frac{\Delta t}{\Delta}u_f[1]-1+c)\\
+    c\geq0.5\geq \frac{\Delta t}{\Delta}(u_f[]-u_f[1]);&\  1-c\geq0.5\geq \frac{\Delta t}{\Delta}(u_f[]-u_f[1])\label{equ:restriction}
+\end{align}
+with CFL$<0.5$, the restriction can be easily satisfied therefore preserving the volume conservation. Note however such restriction is deduced based on the assumption that the volume fraction of current cell is the only accessible.
+
+\subsection{\func{sweep\_x}}
+\func{sweep\_x} aims to achieve advection equation \ref{equ:advec3x} in each direction. Notably, similar method is also applied to the advection of tracer in which the dilation term is added.
+\subsubsection{Parameters}
 \begin{table}[h]
   \centering
   \begin{tabular}{|c|c|c|c|c|}
     \hline
     Name & Data type & Status & Option & Representation (before/after)\\[0.5ex]
     \hline\hline
-    \rowcolor{output} \para{a} & scalar* & update & complusory & $\delta \mathbf{u}^{*,k}/\delta \mathbf{u}^{*,k+1}$\\
+    \rowcolor{output} \para{c} & scalar & \textbf{updated} & compulsory & $c^n$/$c^\ast$\\
     \hline
-    \para{b} & scalar* & unchange & complusory & $RES$\\
+    \para{cc} & scalar & unchanged & complusory & $c_c$ in equation \ref{equ:gcorrect}\\
     \hline
-    \para{dt} & double & unchange & complusory & $\Delta t$\\
-    \hline
-    \para{l} & int & unchange & complusory &  mesh level \\
-    \hline
-    \para{data} & struct Vsicosity & unchange & complusory & $\mu^ {n+\frac{1}{2}}, \rho^{n+\frac{1}{2}}, \Delta t$ \\
+    \para{tcl} & scalar & unchanged & complusory & tracer coefficient $t_c$\\
     \hline
   \end{tabular}
-  \caption{Referenc table of parameters.}
-  \label{tab:test}
 \end{table}
-The highlighted row in the table indicates such paramter is either the output or has been updated. Second subsection always concerns with detals and specific technique the function employed. Finally the third part is the workflow of the program.\par
-Throughout documentation font \para{para} represents exact name of parameters and \func{function} represents exact name of the function.
-
-Tikz inside text example: $\testA$.
-
-\section{Program Workflow Example}
-\begin{multicols}{2}
-  \begin{tikzpicture}
-    \node [block](init){
-        \textbf{Starting Point}\\
-        \textbf{input}: \\
-        \para{f} = $\Phi^n$ \para{uf} = $u_f^{n+ \frac{1}{2}}$\\ \para{flux}(empty) \para{dt}=$\Delta t$\\ \para{src} = $ \mathbf{g}^n$\\
-        \textbf{gradient}:\\
-        \para{g} = $\nabla$ \para{f} = $\nabla \Phi$
-      };
-  \end{tikzpicture}
- \columnbreak
- \begin{minted}{cpp}
-void tracer_fluxes (scalar f,
-		    face vector uf,
-		    face vector flux,
-		    double dt,
-		    (const) scalar src)
-{
-  vector g[];
-  gradients ({f}, {g});
- \end{minted}
- 
-\end{multicols}
-
-\begin{center}
-  \begin{tikzpicture}
-    \draw[-latex,thick](0,0) -- (0,-1); 
-  \end{tikzpicture}
-\end{center}
-
+\subsubsection{Worth Mentioning Details}
+The dilation coefficient for tracer advection is defined as 
+\begin{equation}
+    t_c=\left\{
+    \begin{array}{cc}
+        t_{ij}/c_i & c^n\geq0.5 \\
+        t_{ij}/c_i & c^n<0.5
+    \end{array}
+    \right.
+\end{equation}
+Note if inverse is true, the $c_i$ changes as $(1-c_i)$. Different from volume fraction advection, the face flux for tracer is computed using 1D BCG scheme.
+\begin{equation}
+    \mathbf{F}_t[] = u_f[]\cdot c^\ast[](\frac{t[]}{c^n[]}+\frac{\Delta}{2}[s_d-\frac{\Delta t}{\Delta}u_f[]]\frac{\partial t[]}{\partial x})
+\end{equation}
+Where the gradient is compute by interface biased scheme introduced in section \ref{sec:gradient} and $s_d$ is the upwind coefficient (see 'bcg.h documentation' for more).
+Owing to change of volume fraction, the current volume fraction should be updated by multiplying the latest volume fraction $c^\ast$. The advection for tracer now yields
+\begin{equation}
+    t^\ast_d = t^n - \frac{\Delta t}{\Delta}(\mathbf{F}_{t,d}[1]-\mathbf{F}_{t,d}[]) + \frac{t_c\Delta t}{\Delta}(u_{f,d}[1]-u_{f,d}[])
+\end{equation}
+The function is replicated into \func{sweep\_y} and \func{sweep\_z} by macro $foreach\_dimension()$.
+\subsection{\func{vof\_advection}}
+The VOF advection along with tracer advection is assembled in function \func{vof\_advection}.
+\subsubsection{Parameters}
+\begin{table}[h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|}
+    \hline
+    Name & Data type & Status & Option & Representation (before/after)\\[0.5ex]
+    \hline\hline
+    \rowcolor{output} \para{interfaces} & scalar* & \textbf{updated} & compulsory & $c_i^n$/$c_i^{n+1}$\\
+    \hline
+    \para{i} & int & unchanged & complusory & number of time step\\
+    \hline
+  \end{tabular}
+\end{table}
+\subsubsection{Worth Mentioning Details}
+Direction switch is implemented by counting the time step $i$. 
+\begin{equation}
+    D = (i+d)\ mod \ 3 \quad d = 0,1,2\cdots
+\end{equation}
+Where $D = 0,1,2$ indicates $x,y,z$ direction and shows up in specific sequence depending on $i$.
+\section{Draft}
+If all the volume fraction is known, flux $\mathbf{F}$ on each face is
+\begin{align}
+    min(u_f[],c[-1])\geq F[] \geq max(0,u_f[]-\bar{c}[-1])\quad &u_f[]\geq0\\
+    -max(0,-u_f[]-\bar{c}[])\geq F[] \geq -min(-u_f[],c[])\quad &u_f[]<0
+\end{align}
+The flux difference $\Delta F_d[] = F_d[]-F_d[1]$ therefore is
+\begin{align}
+    min(u_f[],c[-1])-max(0,u_f[1]-\bar{c}[])\geq \Delta F[]\geq max(0,u_f[]-\bar{c}[-1]) - min(u_f[1],c[])\quad &u_f[]>0,u_f[1]>0\\
+    min(u_f[],c[-1]) + min(-u_f[1],c[1])\geq \Delta F[]\geq max(0,u_f[]-\bar{c}[-1]) + max(0,-u_f[1]-\bar{c}[1])\quad &u_f[]>0,u_f[1]<0\\
+    -max(0,-u_f[]-\bar{c}[])-max(0,u_f[1]-\bar{c}[])\geq \Delta F[]\geq -min(-u_f[],c[]) - min(u_f[1],c[])\quad &u_f[]<0,u_f[1]>0\\
+    -max(0,-u_f[]-\bar{c}[])+ min(-u_f[1],c[1])\geq \Delta F[]\geq -min(-u_f[],c[]) + max(0,-u_f[1]-\bar{c}[1])\quad &u_f[]<0,u_f[1]<0
+\end{align}
 \printbibliography
 \end{document}
