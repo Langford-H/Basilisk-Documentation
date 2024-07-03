@@ -58,7 +58,7 @@
     \vskip 1em%
     {\large \@date\par}%
     \vskip 1em%
-    {\large version:draft}%
+    {\large version:1.0}%
   \end{center}%
   \par
   \vskip 1.5em}
@@ -232,6 +232,7 @@ static void vof_concentration_refine (Point point, scalar s)
   \end{tikzpicture}
 \end{center}
 
+\newpage
 \begin{multicols}{2}
   \begin{tikzpicture}
     \node [block]{
@@ -331,7 +332,7 @@ The condition where $g=0$ i.e. no dilation has been fully discussed, consider no
     \label{fig:dilation}
 \end{figure}
 Nevertheless, the dilation can be harmful at certain circumstance. As shown by figure \ref{fig:dilation2} where the volume fraction now becomes $c^n=0$, with input face velocity the dilation now promotes clipping ($c<0$) owing to area difference (blue area).
-\subsubsection{Coefficient $g$ and CFL number}
+\subsubsection{Coefficient $g$ and CFL number}\label{sec:glimit}
 Basilisk follows work by Weymouth and Yue\cite{2010_Weymouth} and sets coefficient $g$ as 
 \begin{equation}\label{equ:gcorrect}
     g=c_c=\left\{
@@ -368,7 +369,7 @@ with CFL$<0.5$, the restriction can be easily satisfied therefore preserving the
 \end{table}
 \subsubsection{Worth Mentioning Details}
 The dilation coefficient for tracer advection is defined as 
-\begin{equation}
+\begin{equation}\label{equ:tcoef}
     t_c=\left\{
     \begin{array}{cc}
         t_{ij}/c_i & c^n\geq0.5 \\
@@ -377,15 +378,230 @@ The dilation coefficient for tracer advection is defined as
     \right.
 \end{equation}
 Note if inverse is true, the $c_i$ changes as $(1-c_i)$. Different from volume fraction advection, the face flux for tracer is computed using 1D BCG scheme.
-\begin{equation}
-    \mathbf{F}_t[] = u_f[]\cdot c^\ast[](\frac{t[]}{c^n[]}+\frac{\Delta}{2}[s_d-\frac{\Delta t}{\Delta}u_f[]]\frac{\partial t[]}{\partial x})
+\begin{equation}\label{equ:bcgflux}
+    \mathbf{F}_t[] = u_f[]\cdot c_f[](\frac{t[]}{c^n[]}+\frac{\Delta}{2}[s_d-\frac{\Delta t}{\Delta}u_f[]]\frac{\partial t[]}{\partial x})
 \end{equation}
 Where the gradient is compute by interface biased scheme introduced in section \ref{sec:gradient} and $s_d$ is the upwind coefficient (see 'bcg.h documentation' for more).
-Owing to change of volume fraction, the current volume fraction should be updated by multiplying the latest volume fraction $c^\ast$. The advection for tracer now yields
-\begin{equation}
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[height=2.5cm]{image/cf.pdf}
+    \caption{The sketch of partial fraction $c_f$.}
+    \label{fig:cfcompute}
+\end{figure}
+$c_f$ as demonstrated by figure \ref{fig:cfcompute} is in fact the average partial fraction of geometric flux which serves as a face coefficient on tracer flux. The advection for tracer now yields
+\begin{equation}\label{equ:traceradv}
     t^\ast_d = t^n - \frac{\Delta t}{\Delta}(\mathbf{F}_{t,d}[1]-\mathbf{F}_{t,d}[]) + \frac{t_c\Delta t}{\Delta}(u_{f,d}[1]-u_{f,d}[])
 \end{equation}
 The function is replicated into \func{sweep\_y} and \func{sweep\_z} by macro $foreach\_dimension()$.
+
+\subsubsection{Program Workflow}
+
+\begin{multicols}{2}
+  \begin{tikzpicture}
+    \node [block]{
+        \textbf{1. Starting Point}\\
+        \textbf{A. input}:\\
+        $\para{c}=c,\para{cc}=c_c,\para{tcl}=t_c$\\
+        where \para{tcl} is computed in function \func{vof\_advection}.\\
+        \para{n} and \para{alpha} are defined for the interface reconstruction and geometric advection. Owing to 1D advection, the flux is stored in scalar \para{flux} instead of face vector data. 
+      };
+  \end{tikzpicture}
+ \columnbreak
+ \begin{minted}{cpp}
+foreach_dimension()
+static void sweep_x (scalar c, scalar cc, scalar * tcl)
+{
+  vector n[];
+  scalar alpha[], flux[];
+  double cfl = 0.;
+ \end{minted}
+\end{multicols}
+
+\begin{center}
+  \begin{tikzpicture}
+    \draw[-latex,thick](0,0) -- (0,-1); 
+  \end{tikzpicture}
+\end{center}
+
+\begin{multicols}{2}
+  \begin{tikzpicture}
+    \node [block]{
+        \textbf{2. Preparation for Tracer Advection}\\
+        \textbf{A. variable defined}:\\
+        For each tracer, two scalar types of data: \para{gf} and \para{tflux} are defined which represent tracer flux and tracer gradient respectively, and these are stored in corresponding lists.\\
+        \textbf{B. tracer gradient computation}\\
+        Compute gradient using function \func{vof\_concentration\_gradient\_x} for every tracer.\\
+      };
+  \end{tikzpicture}
+ \columnbreak
+ \begin{minted}{cpp}
+  scalar * tracers = c.tracers, * gfl = NULL, * tfluxl = NULL;
+  if (tracers) {
+    for (scalar t in tracers) {
+      scalar gf = new scalar, flux = new scalar;
+      gfl = list_append (gfl, gf);
+      tfluxl = list_append (tfluxl, flux);
+    }
+    foreach() {
+      scalar t, gf;
+      for (t,gf in tracers,gfl)
+	gf[] = vof_concentration_gradient_x (point, c, t);
+    }
+  }
+ \end{minted}
+\end{multicols}
+
+\begin{center}
+  \begin{tikzpicture}
+    \draw[-latex,thick](0,0) -- (0,-1); 
+  \end{tikzpicture}
+\end{center}
+
+\newpage
+\begin{multicols}{2}
+  \begin{tikzpicture}
+    \node [block]{
+        \textbf{3. Computation of Geometric Advection Flux}\\
+        \textbf{A. interface reconstruction}:\\
+        Before computing the flux, the interface is reconstructed exclusively based on distribution of $c$.\\
+        \textbf{B. flux computation}\\
+        The face velocity \para{uf.x[]} is first calculated and stored in \para{un} as CFL number. After update the CFL number to its largest value, the partial fraction is computed by tool from \textbf{geometry.h} from 'upwinded' cell and stored in \para{cf}. The flux is therefore obtained as\\
+        $\para{flux}=\para{uf.x[]}\times \para{cf}$\\
+      };
+  \end{tikzpicture}
+ \columnbreak
+ \begin{minted}{cpp}
+  reconstruction (c, n, alpha);
+  foreach_face(x, reduction (max:cfl)) {
+    double un = uf.x[]*dt/(Delta*fm.x[] + SEPS), s = sign(un);
+    int i = -(s + 1.)/2.;
+#if EMBED
+    if (cs[] >= 1.)
+#endif
+    if (un*fm.x[]*s/(cm[] + SEPS) > cfl)
+      cfl = un*fm.x[]*s/(cm[] + SEPS);
+    double cf = (c[i] <= 0. || c[i] >= 1.) ? c[i] :
+      rectangle_fraction ((coord){-s*n.x[i], n.y[i], n.z[i]}, alpha[i],
+      (coord){-0.5, -0.5, -0.5},
+      (coord){s*un - 0.5, 0.5, 0.5});
+    flux[] = cf*uf.x[];
+ \end{minted}
+\end{multicols}
+
+\begin{center}
+  \begin{tikzpicture}
+    \draw[-latex,thick](0,0) -- (0,-1); 
+  \end{tikzpicture}
+\end{center}
+
+\begin{multicols}{2}
+  \begin{tikzpicture}
+    \node [block]{
+        \textbf{4. Computation of Tracer Advection Flux}\\
+        \textbf{A. preparation}:\\
+        $\para{cf1}=c_f$, $\para{ci}=c[]$, check in which phase the tracer exists.\\
+        \textbf{B. BCG flux computation}\\
+        Implementation of equation \ref{equ:bcgflux} for tracer-existing phase. Otherwise the tracer flux vanishes.\\
+        \textbf{C. clean up}\\
+        Clean up the tracer gradient and free the corresponding memory. Output warning if the CFL number exceeds the critical as discussed in section \ref{sec:glimit}.
+      };
+  \end{tikzpicture}
+ \columnbreak
+ \begin{minted}{cpp}
+    scalar t, gf, tflux;
+    for (t,gf,tflux in tracers,gfl,tfluxl) {
+      double cf1 = cf, ci = c[i];
+      if (t.inverse)
+	cf1 = 1. - cf1, ci = 1. - ci;
+      if (ci > 1e-10) {
+	double ff = t[i]/ci + s*min(1., 1. - s*un)*gf[i]*Delta/2.;
+	tflux[] = ff*cf1*uf.x[];
+      }
+      else
+	tflux[] = 0.;
+    }
+  }
+  delete (gfl); free (gfl);
+  if (cfl > 0.5 + 1e-6)
+    fprintf (ferr, 
+	     "WARNING: CFL must be <= 0.5 for VOF (cfl - 0.5 = %g)\n", 
+	     cfl - 0.5), fflush (ferr);
+ \end{minted}
+\end{multicols}
+
+\begin{center}
+  \begin{tikzpicture}
+    \draw[-latex,thick](0,0) -- (0,-1); 
+  \end{tikzpicture}
+\end{center}
+
+\newpage
+\begin{multicols}{2}
+  \begin{tikzpicture}
+    \node [block]{
+        \textbf{5. Volume Fraction Update (Non-embed)}\\
+        \textbf{A. volume fraction update}:\\
+        Implementation of equation \ref{equ:advec3x} with dilation term.\\
+        \textbf{B. tracer update}\\
+        Implementation of equation \ref{equ:traceradv}. Note however, for advection of tracers the dilation term is optional and can be turned off by macro.\\
+      };
+  \end{tikzpicture}
+ \columnbreak
+ \begin{minted}{cpp}
+#if !EMBED
+  foreach() {
+    c[] += dt*(flux[] - flux[1] + cc[]*(uf.x[1] - uf.x[]))/(cm[]*Delta);
+#if NO_1D_COMPRESSION
+    scalar t, tflux;
+    for (t, tflux in tracers, tfluxl)
+      t[] += dt*(tflux[] - tflux[1])/(cm[]*Delta);
+#else // !NO_1D_COMPRESSION
+    scalar t, tc, tflux;
+    for (t, tc, tflux in tracers, tcl, tfluxl)
+      t[] += dt*(tflux[] - tflux[1] + tc[]*(uf.x[1] - uf.x[]))/(cm[]*Delta);
+#endif // !NO_1D_COMPRESSION
+  }
+#else // EMBED
+ \end{minted}
+\end{multicols}
+
+\begin{center}
+  \begin{tikzpicture}
+    \draw[-latex,thick](0,0) -- (0,-1); 
+  \end{tikzpicture}
+\end{center}
+
+\begin{multicols}{2}
+  \begin{tikzpicture}
+    \node [block]{
+        \textbf{6. Volume Fraction Update (embed)}\\
+        \textcolor{red}{waiting for the lastest version}
+        \textbf{A. volume fraction update}:\\
+        \textbf{B. tracer update}\\
+        \textbf{C. clean up}\\
+        Delete and free the memory of \para{tflux}.
+      };
+  \end{tikzpicture}
+ \columnbreak
+ \begin{minted}{cpp}
+  foreach()
+    if (cs[] > 0.) {
+      c[] += dt*(flux[] - flux[1] + cc[]*(uf.x[1] - uf.x[]))/Delta;
+#if NO_1D_COMPRESSION
+      for (t, tflux in tracers, tfluxl)
+	t[] += dt*(tflux[] - tflux[1])/Delta;
+#else // !NO_1D_COMPRESSION
+      scalar t, tc, tflux;
+      for (t, tc, tflux in tracers, tcl, tfluxl)
+	t[] += dt*(tflux[] - tflux[1] + tc[]*(uf.x[1] - uf.x[]))/Delta;
+#endif // !NO_1D_COMPRESSION
+    }
+#endif // EMBED
+
+  delete (tfluxl); free (tfluxl);
+}
+ \end{minted}
+\end{multicols}
 \subsection{\func{vof\_advection}}
 The VOF advection along with tracer advection is assembled in function \func{vof\_advection}.
 \subsubsection{Parameters}
@@ -407,6 +623,128 @@ Direction switch is implemented by counting the time step $i$.
     D = (i+d)\ mod \ 3 \quad d = 0,1,2\cdots
 \end{equation}
 Where $D = 0,1,2$ indicates $x,y,z$ direction and shows up in specific sequence depending on $i$.
+
+\subsubsection{Program Workflow}
+
+\begin{multicols}{2}
+  \begin{tikzpicture}
+    \node [block]{
+        \textbf{1. Starting Point}\\
+        \textbf{A. input}:\\
+        $\para{interface}=c_i, \para{i} = i$\\
+        Since data type of \para{interface} is scalar* the advection interface can be multiple.\\
+        \textbf{B. preparation}\\
+        $\para{cc}=c_c$ and \para{tcl} is the scalar list contains $t_c$ for each tracer.
+      };
+  \end{tikzpicture}
+ \columnbreak
+ \begin{minted}{cpp}
+void vof_advection (scalar * interfaces, int i)
+{
+  for (scalar c in interfaces) {
+    scalar cc[], * tcl = NULL, * tracers = c.tracers; 
+ \end{minted}
+\end{multicols}
+
+\begin{center}
+  \begin{tikzpicture}
+    \draw[-latex,thick](0,0) -- (0,-1); 
+  \end{tikzpicture}
+\end{center}
+
+\begin{multicols}{2}
+  \begin{tikzpicture}
+    \node [block]{
+        \textbf{2. Tracer Settings}\\
+        \textbf{A. definition of tracer dilation coefficient}:\\
+        $\para{tc}=t_c$ is the tracer dilation coefficient and is stored in list \para{tcl} for each kind of tracer.\\
+        \textbf{B. TREE-grid arrangement for tracer}\\
+        The setting is the same as the one in function \func{vof\_concentration\_refine} to make sure the refine and prolongation use the conservative method.
+      };
+  \end{tikzpicture}
+ \columnbreak
+ \begin{minted}{cpp}
+    for (scalar t in tracers) {
+#if !NO_1D_COMPRESSION
+      scalar tc = new scalar;
+      tcl = list_append (tcl, tc);
+#endif // !NO_1D_COMPRESSION
+#if TREE
+      if (t.refine != vof_concentration_refine) {
+	t.refine = t.prolongation = vof_concentration_refine;
+	t.restriction = restriction_volume_average;
+	t.dirty = true;
+	t.c = c;
+      }
+#endif // TREE
+    }
+ \end{minted}
+\end{multicols}
+
+\begin{center}
+  \begin{tikzpicture}
+    \draw[-latex,thick](0,0) -- (0,-1); 
+  \end{tikzpicture}
+\end{center}
+
+\newpage
+\begin{multicols}{2}
+  \begin{tikzpicture}
+    \node [block]{
+        \textbf{3. Computation of Dilation Coefficient}\\
+        Implement of equation \ref{equ:gcorrect} and \ref{equ:tcoef}.
+      };
+  \end{tikzpicture}
+ \columnbreak
+ \begin{minted}{cpp}
+    foreach() {
+      cc[] = (c[] > 0.5);
+#if !NO_1D_COMPRESSION
+      scalar t, tc;
+      for (t, tc in tracers, tcl) {
+	if (t.inverse)
+	  tc[] = c[] < 0.5 ? t[]/(1. - c[]) : 0.;
+	else
+	  tc[] = c[] > 0.5 ? t[]/c[] : 0.;
+      }
+#endif // !NO_1D_COMPRESSION
+    }
+ \end{minted}
+\end{multicols}
+
+\begin{center}
+  \begin{tikzpicture}
+    \draw[-latex,thick](0,0) -- (0,-1); 
+  \end{tikzpicture}
+\end{center}
+
+\begin{multicols}{2}
+  \begin{tikzpicture}
+    \node [block]{
+        \textbf{4. Direction Switch and Default Calling}\\
+        \textbf{A. direction switch}:\\
+        As discussed in previous section, the direction switch is achieved by counting the steps $i$. The list stores tracer coefficient is cleaned.\\
+        \textbf{B. default calling}\\
+        The function \func{vof\_advection} is called on every interface at each time step.
+      };
+  \end{tikzpicture}
+ \columnbreak
+ \begin{minted}{cpp}
+    void (* sweep[dimension]) (scalar, scalar, scalar *);
+    int d = 0;
+    foreach_dimension()
+      sweep[d++] = sweep_x;
+    for (d = 0; d < dimension; d++)
+      sweep[(i + d) % dimension] (c, cc, tcl);
+    delete (tcl), free (tcl);
+  }
+}
+
+event vof (i++)
+  vof_advection (interfaces, i);
+ \end{minted}
+\end{multicols}
+
 \section{Draft}
 If all the volume fraction is known, flux $\mathbf{F}$ on each face is
 \begin{align}
