@@ -1,0 +1,217 @@
+\documentclass[a4paper]{article}
+
+\usepackage[table]{xcolor}%this has to be the first!!!!!!
+\usepackage{fullpage} % Package to use full page
+%\usepackage{parskip} % Package to tweak paragraph skipping
+\usepackage{tikz} % Package for drawing
+\usetikzlibrary{shapes,arrows,matrix,positioning}
+\usepackage{amsmath}
+\usepackage{indentfirst}
+\usepackage{hyperref}
+\usepackage{subcaption}
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{minted}
+\usepackage{multicol}
+\usepackage{mathrsfs}
+%color define
+\definecolor{codebg}{RGB}{230,255,253}
+\definecolor{function}{RGB}{210,0,26}
+\definecolor{para}{RGB}{255,137,137}
+\definecolor{output}{RGB}{238,224,201}
+\setminted[cpp]{mathescape=true,breaklines,bgcolor=codebg,linenos}
+
+\tikzset{
+  block/.style = {rectangle, draw, fill=output, text width=6cm, text centered, rounded corners, minimum height=4em},
+  line/.style = {draw, -latex'},
+}
+
+%function newcommand
+\newcommand{\func}[1]{\textbf{\textcolor{function}{#1}}}
+\newcommand{\para}[1]{\textbf{\emph{\textcolor{para}{#1}}}}
+
+%other examples for icon in text
+%WARNING: the number is not allowed in newcommand name
+\newcommand{\testA}{\tikz \fill[brown] (2pt,2pt) rectangle (8pt,8pt);}
+\newcommand{\testB}{\tikz \fill[black] (3pt,3pt) circle (3pt);}
+
+\usepackage{biblatex}
+\addbibresource{bibliography.bib}
+\title{embed-tree.h documentation}
+\author{Haochen(Langford) Huang}
+\date{\today}
+
+\makeatletter%title setting
+\def\@maketitle{%
+  \newpage
+  \null
+  \vskip 2em%
+  \begin{center}%
+  \let \footnote \thanks
+    {\LARGE \@title \par}%
+    \vskip 1.5em%
+    {\Large
+      \lineskip .5em%
+      \begin{tabular}[t]{c}%
+        \@author
+      \end{tabular}\par}%
+    \vskip 1em%
+    {\large \@date\par}%
+    \vskip 1em%
+    {\large version:draft}%
+  \end{center}%
+  \par
+  \vskip 1.5em}
+\makeatother
+
+\begin{document}
+
+\maketitle
+\section{Introduction}
+Current header file provides restriction, prolongation and refinement under tree grid for corresponding value employed in \textbf{embed.h}. The content can be separated into two parts: the refinement of cut-cell value i.e. \para{cs} and \para{fs} and the restriction/prolongation of value on cut-cell and cut-face.
+
+\section{Refinement of Embed associated value}
+\subsection{\func{embed\_face\_fraction\_refine}}
+Given face vector \para{fs} on mesh level $N$, function \func{embed\_face\_fraction\_refine} returns \para{fs} on finer mesh level $N+1$. Computation of face fraction is achieved by first computing the fraction of 'inner' faces then the 'boundary' faces both under $2D$ and $3D$ conditions. For sake of convenience, the implementation on $2D$ cases is first introduced then followed by the implementation on $3D$ condition. The program however is arranged based on computation on 'inner' faces or 'boundary' faces.\par
+Note that the function is duplicated by macro $foreach\_dimension$ and each function is only responsible for facial fraction computation on one direction. The introduction shall take computation on $x$ as an example hereinafter.\par
+Moreover, for a cut-cell ($\para{cs} \in (0,1)$) the interface exclusively yields as 
+\begin{equation}\label{equ:interface}
+    \mathbf{n}\cdot\mathbf{x} = \alpha
+\end{equation}
+where $\mathbf{n}$ is the normal direction of the interface, $\mathbf{x}$ represents coordinates of arbitrary point at the interface and $\alpha$ is the constant. This holds true for both condition and is the critical in identifying different condition in the upcoming sections.
+\subsubsection{$2D$ Condition}
+First consider the fine faces contained inside the cell as shown by $A,B$ in figure \ref{fig:2Dinner}.\par
+\begin{figure}[h]
+    \centering
+    \includegraphics[height=6cm]{image/fs_2D.pdf}
+    \caption{Sketch for inner fine faces $A,B$, two red lines display example threshold value for the interfaces.}
+    \label{fig:2Dinner}
+\end{figure}
+The very first step to compute face fraction is to identify whether the interface comes across the inner fine faces. Given $\alpha=\alpha_1$ and $\mathbf{n}=(n_x,n_y)$ of the interface and coordinate system whose $(0,0)$ locates at center of the cell, the lower and upper boundary for the condition is the line set passing $(0,0.5),(0,-0.5)$ respectively. According to equation \ref{equ:interface}, once
+\begin{equation}\label{equ:judge}
+    |2\alpha_1|<|n_y|
+\end{equation}
+the interface will come across the inner fine faces otherwise both the face fraction are $0$ or $1$ determined by interface direction.
+If equation \ref{equ:judge} holds true the intersection point $(0,y_i)$ between interface and y-axis yields $y_i = \frac{\alpha}{n_y}$. The face fraction for face $A,B$ therefore can be obtained accordingly.\par
+Following a similar process, the boundary fine face fraction is calculated first by identifying the intersection point (if exists) then computing the fine face fraction. Different from the previous, the face fraction can be visited directly without equation \ref{equ:judge}. The orientation of the interface is obtained by checking corresponding transverse faces as shown by (1-4) in figure \ref{fig:2Dboundary}. Combined with face fraction on original face, the fine face fraction is therefore obtained.
+\begin{figure}[h]
+    \centering
+    \includegraphics[height=6cm]{image/fs_2D2.pdf}
+    \caption{Sketch for boundary fine faces $C,D$, the numerical labels mark the corresponding transverse faces.}
+    \label{fig:2Dboundary}
+\end{figure}
+
+\subsubsection{$3D$ Condition}
+The fine face fraction for both inner and boundary faces are computed directly using $2D$ projection from a $3D$ interface.\par
+First consider the inner face, as shown by figure \ref{fig:3Dinner}, the fine face fraction is computed from $2D$ projection in red contour cell. Moreover the iteration is accomplished among four subcells by rotating the whole interface as in section (unfinished). Specifically, 
+given $\mathbf{n}=(n_x,n_y,n_z)$ and $\alpha=\alpha_1$ of the example interface shown by figure \ref{fig:3Dinner1}, the face fraction on the inner fine face can be obtained by calculating the volume fraction of reconstructed interface shown by figure \ref{fig:3Dinner2}. Since the volume calculation can be achieved by tool provided by \textbf{geometry.h}, the problem degenerates as how to reconstruct the interface and get its $\mathbf{n},\alpha$.\par
+Note the fact that the reconstructed interface is perpendicular to the projection plane and comes across the same line as original interface on projection plane, its $\mathbf{n}=(0,n_y,n_z), \alpha=\alpha_1$.\par
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[height=6cm]{image/fs_3D3.pdf}
+        \subcaption{}
+        \label{fig:3Dinner}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[height=6cm]{image/fs_3D4.pdf}
+        \subcaption{}
+        \label{fig:3Dboundary}
+    \end{subfigure}
+    \caption{Inner fine face (a) and boundary fine face (b) under 3D condition. The red contour highlights the cell where projection takes place.}
+    \label{fig:3Dface}
+\end{figure}
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[height=6cm]{image/fs_3D1.pdf}
+        \subcaption{}
+        \label{fig:3Dinner1}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[height=6cm]{image/fs_3D2.pdf}
+        \subcaption{}
+        \label{fig:3Dinner2}
+    \end{subfigure}
+
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[height=6cm]{image/fs_3D5.pdf}
+        \subcaption{}
+        \label{fig:3Dinner3}
+    \end{subfigure}
+    \caption{A zoom in for highlighted cell in figure \ref{fig:3Dface}. (a) The original interface and (b) the projection interface for inner face in figure \ref{fig:3Dinner} and (c) the original interface for boundary fine face in figure \ref{fig:3Dboundary}.}
+\end{figure}
+
+Similarly, the fine face fraction on boundary face is also computed by projection but on the boundary plane. An example is shown by figure \ref{fig:3Dinner3} where reconstructed plane should pass the intersection line on boundary face (blue line) as well as the red dashed. Given an arbitrary point set $(0.5,y_1,z_1),(0,y_1,z_1)$ the $\alpha=\alpha_2$ of the reconstructed interface has relation:
+\begin{align}
+    0.5n_x+y_1n_y+z_1n_z &= \alpha_1\\
+    y_1n_y+z_1n_z &= \alpha_2\\
+    \alpha_2 &= \alpha_1-0.5n_x
+\end{align}
+Consider the normal direction $(0,n_y,n_z)$, the face fraction therefore can be calculated.
+
+\section{Readme}
+Normally, a documentation would consist of two major parts: Introduction \& Backround and Function. The first part will introduce the purpose of the corresponding program and the governing equations it solved and other thing developers and users should be aware of \emph{e.g.} in which method the program solve the overall problem. Pragmatic program will be explored line by line in the second part. It first contains a table to clearify all the parameters and their physical representatives as shown in Table.\ref{tab:test}. 
+\begin{table}[h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|}
+    \hline
+    Name & Data type & Status & Option & Representation (before/after)\\[0.5ex]
+    \hline\hline
+    \rowcolor{output} \para{a} & scalar* & update & complusory & $\delta \mathbf{u}^{*,k}/\delta \mathbf{u}^{*,k+1}$\\
+    \hline
+    \para{b} & scalar* & unchange & complusory & $RES$\\
+    \hline
+    \para{dt} & double & unchange & complusory & $\Delta t$\\
+    \hline
+    \para{l} & int & unchange & complusory &  mesh level \\
+    \hline
+    \para{data} & struct Vsicosity & unchange & complusory & $\mu^ {n+\frac{1}{2}}, \rho^{n+\frac{1}{2}}, \Delta t$ \\
+    \hline
+  \end{tabular}
+  \caption{Referenc table of parameters.}
+  \label{tab:test}
+\end{table}
+The highlighted row in the table indicates such paramter is either the output or has been updated. Second subsection always concerns with detals and specific technique the function employed. Finally the third part is the workflow of the program.\par
+Throughout documentation font \para{para} represents exact name of parameters and \func{function} represents exact name of the function.
+
+Tikz inside text example: $\testA$.
+
+\section{Program Workflow Example}
+\vspace{1mm}
+\begin{multicols}{2}
+  \begin{tikzpicture}
+    \node [block](init){
+        \textbf{Starting Point}\\
+        \textbf{input}: \\
+        \para{f} = $\Phi^n$ \para{uf} = $u_f^{n+ \frac{1}{2}}$\\ \para{flux}(empty) \para{dt}=$\Delta t$\\ \para{src} = $ \mathbf{g}^n$\\
+        \textbf{gradient}:\\
+        \para{g} = $\nabla$ \para{f} = $\nabla \Phi$
+      };
+  \end{tikzpicture}
+ \columnbreak
+ \begin{minted}{cpp}
+void tracer_fluxes (scalar f,
+		    face vector uf,
+		    face vector flux,
+		    double dt,
+		    (const) scalar src)
+{
+  vector g[];
+  gradients ({f}, {g});
+ \end{minted}
+\end{multicols}
+
+\begin{center}
+  \begin{tikzpicture}
+    \draw[-latex,thick](0,0) -- (0,-1); 
+  \end{tikzpicture}
+\end{center}
+
+\printbibliography
+\end{document}
