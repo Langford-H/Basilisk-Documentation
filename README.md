@@ -31,7 +31,7 @@ The doc is written for those who are interested in how things work inside Basili
 	- [] embed.h and everything associated in other headfile
 	- [] embed-tree.h
 
-![The documentation tree](./readmeimage/filetree.svg|width=100)
+![The documentation tree](./readmeimage/filetree.svg){:height="36px" width="36px"}
 
 ![Basilisk Construction](./readmeimage/layer.svg|width=100)
 
