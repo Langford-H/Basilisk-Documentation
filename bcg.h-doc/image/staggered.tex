@@ -1,0 +1,17 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage[active,tightpage]{preview}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{0.125pt}
+\usetikzlibrary[angles,quotes]
+
+\begin{document}
+\begin{tikzpicture}
+     \draw (-2,0)--(2,0)--(2,4)--(-2,4)--(-2,0);
+     \draw[->] (0,-0.25)--(0,0.75) node[anchor=west]{ $uf_{y}[i]$ };
+     \draw[->] (-2.25,2.0)--(-1.25,2.0) node[anchor=west]{ $uf_x[i]$ };
+     \draw[->] (0,3.75)--(0,4.75) node[anchor=west]{ $uf_{y}[i+1]$ };
+     \draw[->] (1.75,2)--(2.75,2) node[anchor=west]{ $uf_x [i+1]$ };
+\end{tikzpicture}
+
+\end{document}

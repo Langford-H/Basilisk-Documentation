@@ -1,0 +1,20 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage[active,tightpage]{preview}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{0.125pt}
+\usetikzlibrary[angles,quotes]
+
+\begin{document}
+\begin{tikzpicture}
+    \draw[->] (-3,0) -- (3,0) node[anchor=north west] {x};%画出x轴并将最后的终结点其命名为x
+    \draw[->] (0,-1) -- (0,3) node[anchor=south east] {y};%画出y轴并将最后的终结点其命名为y
+    \draw[very thick,red]
+        (0,0) -- (0,2.5);%在线段的中间添加标签，并使用fill = white使线条不透过标签
+    \draw (-2.5,0) -- (-2.5,2.5)--(2.5,2.5)--(2.5,0);
+    \fill [color = red] (0,1.25) circle (2pt) ;
+    \fill (1.25,1.25) circle (2pt) node[above=2pt,fill=white]{$A$};
+    \fill (-1.25,1.25) circle (2pt) node[above=2pt,fill=white]{$B$};
+\end{tikzpicture}
+
+\end{document}
