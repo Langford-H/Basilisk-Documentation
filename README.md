@@ -3,6 +3,14 @@ This is a Documentation for PDE solver [Basilisk](http://basilisk.fr/) written b
 
 The doc is written for those who are interested in how things work inside Basilisk and want to alter the solver.
 
+<figure>
+  <br />
+  <img src="readmeimage/layer.png" height="200">
+  <figcaption>
+  </figcaption>
+  <br /> <br />
+</figure>
+
 # Plan
 ## Those under construction or done 
 - [] centered solver
@@ -30,6 +38,14 @@ The doc is written for those who are interested in how things work inside Basili
 - [] solid embed boundary
 	- [] embed.h and everything associated in other headfile
 	- [] embed-tree.h
+
+<figure>
+  <br />
+  <img src="readmeimage/filetree.png" height="500">
+  <figcaption>
+  </figcaption>
+  <br /> <br />
+</figure>
 
 ## Future maybe
 - [] mesh associated
