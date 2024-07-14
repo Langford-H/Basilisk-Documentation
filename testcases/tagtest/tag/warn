@@ -1,2 +1,0 @@
-tag.c: In function ‘inital’:
-tag.c:20:7: warning: unused variable ‘n’ [-Wunused-variable]
