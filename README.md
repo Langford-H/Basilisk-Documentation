@@ -16,9 +16,9 @@ The doc is written for those who are interested in how things work inside Basili
 - [] centered solver
 	- [] centered.h
 	- [] double-projection.h
-		- [x] [viscosity.h](./viscosity-headfile/viscosity_h_Documentation.pdf)
-		- [x] [poisson.h](./poisson-headfile/poisson_h_Documentation.pdf)
-		- [x] [bcg.h](./bcg-headfile/bcg_h_Documentation.pdf)
+		- [x] [viscosity.h](./viscosity.h-doc/viscosity_h_Documentation.pdf)
+		- [x] [poisson.h](./poisson.h-doc/poisson_h_Documentation.pdf)
+		- [x] [bcg.h](./bcg.h-doc/bcg_h_Documentation.pdf)
 
 - [] VOF multiphase solver
 	- [] two-phase-levelset.h
@@ -27,17 +27,17 @@ The doc is written for those who are interested in how things work inside Basili
 		- [] tracer.h
 	- [] two-phase.h
 		- [] two-phase-generic.h
-		- [] [vof.h](./vof-headfile/vof_h_Documentation.pdf)
+		- [] [vof.h](./vof.h-doc/vof_h_Documentation.pdf)
 			- [] fractions.h
 			- [] geometry.h
 	- [] iforce.h
 		- [] curvature.h
-			- [] [heights.h](./heights-headfile/heights_h_Documentation.pdf)
+			- [] [heights.h](./heights.h-doc/heights_h_Documentation.pdf)
 			- [] parabola.h
 
 - [] solid embed boundary
 	- [] embed.h and everything associated in other headfile
-	- [] embed-tree.h
+	- [] [embed-tree.h](./embed-tree.h-doc/embed_tree_h_Documentation.pdf)
 
 <figure>
   <br />
