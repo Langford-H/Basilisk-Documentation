@@ -1,0 +1,27 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage[active,tightpage]{preview}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{0.125pt}
+\usetikzlibrary[angles,quotes]
+\definecolor{myblue}{rgb}{0.54, 0.81, 0.94}
+\definecolor{bluetext}{rgb}{0.01, 0.28, 1.0}
+\begin{document}
+\begin{tikzpicture}
+    \draw(-1,-1)--(-1,1)--(1,1)--(1,-1)--cycle;
+    \draw(-1,0)--(1,0);
+    \draw(0,-1)--(0,1);
+    \foreach \x in {-1,0,1}
+    {
+        \foreach \y in {-0.5,0.5}
+        {
+            \pgfmathsetmacro\xname{int(\x+1)}
+            \pgfmathsetmacro\yname{int(\y+0.
+            5)}
+
+            \filldraw (\x,\y) circle (0.5pt) node[right,scale=0.5] {\tiny fine(fs.x,\xname,\yname)};
+        }
+    }
+\end{tikzpicture}
+
+\end{document}
