@@ -11,8 +11,15 @@ The doc is written for those who are interested in how things work inside Basili
   <br /> <br />
 </figure>
 
+# For Real What is [Basilisk](http://basilisk.fr/)?
+**Technically, Basilisk consists of two parts.**
+
+Unlike most of the opensourced solver which is indeed a group of header file that can solve a specific type of PDE written in Fortran/C/C++, Basilisk also provides a kind of programme language ( a compiler specifically ) named BasiliskC. For those who have experience of simulation with Basilisk, the [installation process](http://basilisk.fr/src/INSTALL) is the process generating *qcc*: the complier provided by Basilisk.
+
+Therefore a coherent documentation for Basilisk should be twofolds. The first part is the header file, including the solver, the configuration of mesh etc. And the second part is the compiler as well as the design philosophy behind (in my limited personal perspective of course).  
 # Plan
-## Those under construction or done 
+## Header File
+### Incompressible solver 
 - [] centered solver
 	- [] centered.h
 	- [] double-projection.h
@@ -47,9 +54,13 @@ The doc is written for those who are interested in how things work inside Basili
   <br /> <br />
 </figure>
 
-## Future maybe
-- [] mesh associated
+### Compressible solver
 - [] compressible
+
+### Future maybe
+- [] mesh associated
+
+## Compiler
 - [] ast
 
 # Contact
