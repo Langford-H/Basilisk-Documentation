@@ -14,9 +14,13 @@ The doc is written for those who are interested in how things work inside Basili
 # For Real What is [Basilisk](http://basilisk.fr/)?
 **Technically, Basilisk consists of two parts.**
 
-Unlike most of the opensourced solver which is indeed a group of header file that can solve a specific type of PDE written in Fortran/C/C++, Basilisk also provides a kind of programme language ( a compiler specifically ) named BasiliskC. For those who have experience of simulation with Basilisk, the [installation process](http://basilisk.fr/src/INSTALL) is the process generating *qcc*: the complier provided by Basilisk.
+Unlike most open-source solvers, which typically consist of a collection of header files designed to solve specific types of PDEs written in Fortran, C, or C++, Basilisk offers a [Domian Specific Language](https://en.wikipedia.org/wiki/Domain-specific_language) called BasiliskC. For those familiar with simulation using Basilisk, the [installation process](http://basilisk.fr/src/INSTALL) involves generating *qcc*, the [transpiler](https://en.wikipedia.org/wiki/Source-to-source_compiler#:~:text=A%20source%2Dto%2Dsource%20translator,or%20a%20different%20programming%20language.) provided by Basilisk which translates BasiliskC into standard C99 and compiles it with *gcc*. This ensures the generality of the Basilisk: as long as your mechine is equipped with *gcc*, you can run Basilisk on it. Yet another component forms the low-level of Basilisk is the mesh management.
 
-Therefore a coherent documentation for Basilisk should be twofolds. The first part is the header file, including the solver, the configuration of mesh etc. And the second part is the compiler as well as the design philosophy behind (in my limited personal perspective of course).  
+The *qcc*, deeply integrated with tree mesh management, consist the *spirit* of Basilisk, and is the critical to free solver developer from tedious work such as manually memory allocation, MPI compatibility etc.
+
+A coherent documentation for Basilisk should encompass two main components. The first part consists of the header files, which include the solver
+
+
 # Plan
 ## Header File
 ### Incompressible solver 
@@ -57,8 +61,11 @@ Therefore a coherent documentation for Basilisk should be twofolds. The first pa
 ### Compressible solver
 - [] compressible
 
-### Future maybe
-- [] mesh associated
+### Grid
+- [] grid/tree.h
+- [] grid/tree-common.h
+- [] grid/mempool.h
+- [] grid/memindex/range.h
 
 ## Compiler
 - [] ast
