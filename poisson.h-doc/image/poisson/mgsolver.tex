@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage{tikz}
 \usepackage{tikz-3dplot}
+\usepackage{microtype}
 \usepackage{romannum}
 \usepackage[active,tightpage]{preview}
 \PreviewEnvironment{tikzpicture}
@@ -51,14 +52,13 @@
   \draw[very thick,-latex] (0.75,5.5)--(0.75,2.5)node[left,yshift=1.8cm]{\tiny$\mathbf{x}^k, \mathbf{y}$ (1)};
   \draw[very thick,-latex] (0.95,2.5)--(0.95,5.5)node[right,yshift=-1.8cm]{\tiny$RES^k$ (2)};
   \draw[very thick,-latex] (-3,5.7)--(-1,5.7) node[below,midway] {\tiny$ \mathbf{x}^0, \mathbf{y}$ input};
-  \draw[very thick,-latex,red] (0.95,5.6)--(3,5.6);
+  \draw[very thick,-latex,red] (1.05,5.6)--(3,5.6);
   \draw[thick,-latex,red] (2.0,5.6)to[out=90,in=0](0.95,5.9);
   \node at (0.95,5.6) [anchor=north west] {\tiny\textcolor{red}{$RES^k<\epsilon?$}};
+  \node at (0.95,5.3) [anchor=north west] {\tiny\textcolor{red}{$k<$NITERMAX?}};
   \node at (0.95,5.6) [anchor=south west] {\tiny\textcolor{red}{return}};
   \node at (2.0,5.6) [anchor=south west] {\tiny\textcolor{red}{output}};
   
 \end{tikzpicture}
 
 \end{document}
-
-
