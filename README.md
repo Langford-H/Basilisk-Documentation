@@ -23,7 +23,7 @@ Based on our previous discussions, coherent documentation for Basilisk should in
 ## Header File
 ### Incompressible solver 
 - [] centered solver
-	- [] centered.h
+	- [] [centered.h](./centered.h-doc/centered_h_Documentation.pdf)
 	- [] double-projection.h
 		- [x] [viscosity.h](./viscosity.h-doc/viscosity_h_Documentation.pdf)
 		- [x] [poisson.h](./poisson.h-doc/poisson_h_Documentation.pdf)

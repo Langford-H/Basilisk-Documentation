@@ -1,0 +1,214 @@
+\documentclass[a4paper]{article}
+
+\usepackage[table]{xcolor}%this has to be the first!!!!!!
+\usepackage{fullpage} % Package to use full page
+%\usepackage{parskip} % Package to tweak paragraph skipping
+\usepackage{tikz} % Package for drawing
+\usetikzlibrary{shapes,arrows,matrix,positioning}
+\usepackage{amsmath}
+\usepackage{indentfirst}
+\usepackage{hyperref}
+\usepackage{subcaption}
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{minted}
+\usepackage{multicol}
+\usepackage{mathrsfs}
+%color define
+\definecolor{codebg}{RGB}{230,255,253}
+\definecolor{function}{RGB}{210,0,26}
+\definecolor{para}{RGB}{255,137,137}
+\definecolor{output}{RGB}{238,224,201}
+\setminted[cpp]{mathescape=true,breaklines,bgcolor=codebg,linenos}
+
+\tikzset{
+  block/.style = {rectangle, draw, fill=output, text width=6cm, text centered, rounded corners, minimum height=4em},
+  line/.style = {draw, -latex'},
+}
+
+%function newcommand
+\newcommand{\func}[1]{\textbf{\textcolor{function}{#1}}}
+\newcommand{\para}[1]{\textbf{\emph{\textcolor{para}{#1}}}}
+
+%other examples for icon in text
+%WARNING: the number is not allowed in newcommand name
+\newcommand{\testA}{\tikz \fill[brown] (2pt,2pt) rectangle (8pt,8pt);}
+\newcommand{\testB}{\tikz \fill[black] (3pt,3pt) circle (3pt);}
+
+\usepackage{biblatex}
+\addbibresource{basiliskbib.bib}
+\title{centered.h documentation}
+\author{Haochen(Langford) Huang}
+\date{\today}
+
+\makeatletter%title setting
+\def\@maketitle{%
+  \newpage
+  \null
+  \vskip 2em%
+  \begin{center}%
+  \let \footnote \thanks
+    {\LARGE \@title \par}%
+    \vskip 1.5em%
+    {\Large
+      \lineskip .5em%
+      \begin{tabular}[t]{c}%
+        \@author
+      \end{tabular}\par}%
+    \vskip 1em%
+    {\large \@date\par}%
+    \vskip 1em%
+    {\large version:draft}%
+  \end{center}%
+  \par
+  \vskip 1.5em}
+\makeatother
+
+\begin{document}
+
+\maketitle
+\section{Introduction}
+This solver addresses the incompressible Navier-Stokes equations\cite{2003_Popinet,2015_Popinet}:
+
+\begin{gather}
+    \frac{\partial \mathbf{u}}{\partial t} 
+    + \nabla \cdot (\mathbf{u} \otimes \mathbf{u}) 
+    = \frac{1}{\rho} \left(-\nabla p + \nabla \cdot (2\mu \mathbf{D})\right) 
+    + \mathbf{a}
+    \label{equ:nseq1} \\
+    \nabla \cdot \mathbf{u} = 0 
+    \label{equ:nseq2}
+\end{gather}
+
+where the deformation tensor is defined as 
+$
+\mathbf{D} = \frac{1}{2} (\nabla \mathbf{u} + (\nabla \mathbf{u})^T)
+$.
+
+For multiphase flows, the acceleration term $\mathbf{a}$ includes the effects of interfacial forces, such as surface tension. With the incompressibility constraint in equation \ref{equ:nseq2}, the velocity $\mathbf{u}$ and pressure gradient $\nabla p$ at the next time step can be determined using approximate projection methods. The discrete form is:
+
+\begin{gather}
+    \frac{\mathbf{u}^{n+1} - \mathbf{u}^n}{\Delta t} 
+    + \nabla \cdot (\mathbf{u} \otimes \mathbf{u})^{n+1/2} 
+    = \frac{1}{\rho^{n+1/2}} \left(-\nabla p^{n+1} 
+    + \nabla \cdot \left(2\mu^{n+1/2} \mathbf{D}^{**}\right)\right) 
+    + \mathbf{a}^{n+1/2}
+    \label{equ:nseqdes1} \\
+    \nabla \cdot \mathbf{u}^{n+1} = 0 \label{equ:nseqdes2}
+\end{gather}
+
+Here, the viscosity term is computed implicitly using the intermediate velocity $\mathbf{u}^{**}$.
+
+The following subsections will provide a theoretical overview of each step, with practical program analysis presented in subsequent sections. Notably, in the following subsections, face-centered variables will be denoted by the subscript $f$, such as $\mu_f$, to distinguish them from cell-centered variables. Readers are also referred to the excellent introduction written by Edoardo Cipriano \cite{2024_Cipriano}, which has been a great inspiration for this documentation.
+
+\subsection{Algorithm Overview}
+To summarize, solving the Navier-Stokes equations involves four main steps: \textbf{Property Update, Advection, Viscosity, and Projection}, corresponding to distinct stages of the solution process. The first three steps involve solving the following equations:
+
+\begin{gather}
+    \frac{c^{n+1/2} - c^{n-1/2}}{\Delta t} 
+    + \mathbf{F}(c,\mathbf{u}) = 0 \label{equ:colorfunc} \\
+    \rho^{n+1/2} \left[ \frac{\mathbf{u}^{**} - \mathbf{u}^n}{\Delta t} 
+    + \nabla \cdot (\mathbf{u} \otimes \mathbf{u})^{n+1/2} 
+    - \mathbf{a}^{n-1/2} 
+    + \frac{\nabla p^n}{\rho^{n-1/2}} \right] 
+    = \nabla \cdot \left( 2\mu^{n+1/2}_f \mathbf{D}^{**} \right)\label{equ:advdiff}\\
+    \mathbf{u}^{***} = \mathbf{u}^{**} 
+    - \Delta t \left( \mathbf{a}^{n-1/2} 
+    - \frac{\nabla p^n}{\rho^{n-1/2}} \right)\label{equ:diffalter}
+\end{gather}
+
+Once $\mathbf{u}^{***}$ is computed, we obtain $\mathbf{u}^{n+1}$ by:
+
+\begin{equation}
+    \mathbf{u}^{n+1} = \mathbf{u}^{***} 
+    + \Delta t \left( \mathbf{a}^{n+1/2} 
+    - \frac{\nabla p^{n+1}}{\rho^{n+1/2}} \right)
+\end{equation}
+
+Using the incompressibility constraint:
+
+\begin{gather}
+    \nabla \cdot \mathbf{u}^{n+1} = 0
+\end{gather}
+
+the pressure gradient $\nabla p^{n+1}$ can be computed by solving a Poisson equation in the \textbf{Projection} step.
+
+\subsubsection{Property Update}
+Equation \ref{equ:colorfunc} is the discrete form of advection equation for markers
+\begin{equation}
+    \frac{\partial c}{\partial t} + \nabla\cdot(c\mathbf{u}) = 0
+\end{equation}
+the scheme of advection term $\mathbf{F}(c,\mathbf{u})$ varies depending on the practical condition. If $c$ denotes the volume of fluids and the header file \texttt{two-phase.h} is included, the geometric advection scheme in \texttt{vof.h} is activated. Otherwise, if $c$ represents tracers, the BCG scheme is applied to solve the equation. For further details, refer to the \texttt{tracers.h} and \texttt{vof.h} documentation.
+
+The density $\rho$ and viscosity $\mu_f$ at the $n+1/2$ time step are determined based on the distribution of $c$, this step is implemented in \texttt{two-phase-generic.h}. For those condition with large density ratio, there is option to smear the $\alpha_f=1/\rho$ in the same header file, as it is considered in poisson equation solver. All these steps are achieved by event succession, note although the body force such as surface tension is associated with distribution of $c$, it is actually implemented in the \textbf{Projection} step also through succession of event `acceleration'.
+\subsection{Advection}
+
+In this step, we merge the first two terms on the L.H.S. of Equation \ref{equ:advdiff}, solving:  
+\begin{equation}
+    \rho^{n+1/2}\left[\frac{\mathbf{u}^* - \mathbf{u}^n}{\Delta t} + \nabla\cdot(\mathbf{u}\otimes\mathbf{u})^{n+1/2}\right] = 0\label{equ:adv}
+\end{equation}  
+where $\mathbf{u}^*$ is the intermediate velocity. Given the face velocity $\mathbf{u}^{n+1/2}_f$, this equation is solved using functions provided by the header file \texttt{bcg.h}, following the BCG scheme.  For further details on the BCG scheme, please refer to the \texttt{bcg.h} documentation.\\
+The face velocity $\mathbf{u}^{n+1/2}_f$ is first computed using the BCG scheme and then projected to satisfy the non-divergence constraint, as required by the functions provided in \texttt{bcg.h}. Since these functions do not directly output values at $n+1/2$, this computation is performed separately in \texttt{centered.h}.\\
+
+\subsection{Diffusion}
+This step aims to compute $\mathbf{u}^{***}$.  
+Starting from Equation \ref{equ:adv}, Equation \ref{equ:advdiff} becomes:  
+\begin{equation}
+    \rho^{n+1/2} \left[ \frac{\mathbf{u}^{**} - \mathbf{u}^*}{\Delta t}  
+    - \mathbf{a}^{n-1/2} 
+    + \frac{\nabla p^n}{\rho^{n-1/2}} \right] 
+    = \nabla \cdot \left( 2\mu^{n+1/2}_f \mathbf{D}^{**} \right)\label{equ:diff}
+\end{equation}  
+Here, $\mathbf{u}^{**}$ is computed implicitly, and $\mathbf{u}^{***}$ is subsequently determined by equation \ref{equ:diffalter}.
+
+\subsection{Projection}
+
+The final step enforces the non-divergence constraint. A key challenge is managing the conversion between cell-centered and face-centered values, as velocities are stored at cell centers, accelerations are stored at cell faces, and the projection function operates on face values.  
+
+\subsubsection{From Cell-Centered to Face-Centered: Computing $p^{n+1}$}  
+
+We compute the pressure $p^{n+1}$ from:  
+\begin{gather}
+    \frac{\mathbf{u}_f^{n+1} - \mathbf{u}_f^{***}}{\Delta t}
+  = -\frac{\nabla p^{n+1}}{\rho^{n+1/2}} + \mathbf{a}_f^{n+1/2}\\
+    \nabla\cdot\mathbf{u}_f^{n+1} = 0
+\end{gather}  
+which simplifies to:  
+\begin{equation}
+    \nabla\left(\frac{\nabla p^{n+1}}{\rho^{n+1/2}}\right) = \nabla\left(\frac{\mathbf{u}_f^{***}}{\Delta t} + \mathbf{a}_f^{n+1/2}\right)
+\end{equation}  
+Using this relationship, the cell-centered pressure is computed with a multigrid solver applied to the face velocity:  
+\begin{equation}
+    \mathbf{u}_f^{****} = \frac{\mathbf{u}^{***}[] + \mathbf{u}^{***}[-1]}{2}
+  + \Delta t \mathbf{a}_f^{n+1/2}
+\end{equation}  
+Though not required for subsequent steps, the divergence-free face velocity $\mathbf{u}_f^{n+1}$ is also updated.  
+
+\subsubsection{From Face-Centered to Cell-Centered: Updating $\mathbf{u}^{n+1}$}  
+
+With $p^{n+1}$ computed, the cell-centered velocity $\mathbf{u}^{n+1}$ is updated:  
+\begin{equation}
+    \frac{\mathbf{u}^{n+1} - \mathbf{u}^{***}}{\Delta t} = -\frac{\nabla
+    p^{n+1}}{\rho^{n+1/2}} + \mathbf{a}^{n+1/2}
+\end{equation}  
+To transform face-centered values to cell-centered values, the face-centered pressure gradient is computed and combined with the face-centered acceleration $\mathbf{a}_f^{n+1/2}$ to yield:  
+\begin{equation}
+    \mathbf{g}_f^{n+1} = \mathbf{a}_f^{n+1/2} + \frac{\nabla p^{n+1}}{\rho_f^{n+1/2}}
+\end{equation}  
+The cell-centered $\mathbf{g}^{n+1}$ is obtained by averaging:  
+\begin{equation}
+    \mathbf{g}^{n+1} = \frac{\mathbf{g}_f^{n+1}[1] + \mathbf{g}_f^{n+1}[]}{2}
+\end{equation}  
+Finally, the velocity is updated:  
+\begin{equation}
+    \mathbf{u}^{n+1} = \mathbf{u}^{***} + \Delta t \mathbf{g}^{n+1}
+\end{equation}  
+
+\subsubsection{Approximate vs. Exact Projection}  
+
+If the discrete Laplace operator used in the projection step does not strictly equal the divergence of the gradient, the method is called an approximate projection, introducing errors due to operator differences. Otherwise, it is an exact projection\cite{2000_Almgren}.  
+
+One consequence of approximate projection is error accumulation in pressure. Basilisk provides an alternative to address this, detailed in the \texttt{double-projection.h} documentation.  
+
+\printbibliography
+\end{document}
