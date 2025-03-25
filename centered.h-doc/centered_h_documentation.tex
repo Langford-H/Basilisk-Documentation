@@ -205,10 +205,7 @@ Finally, the velocity is updated:
 \end{equation}  
 
 \subsubsection{Approximate vs. Exact Projection}  
-
-If the discrete Laplace operator used in the projection step does not strictly equal the divergence of the gradient, the method is called an approximate projection, introducing errors due to operator differences. Otherwise, it is an exact projection\cite{2000_Almgren}.  
-
-One consequence of approximate projection is error accumulation in pressure. Basilisk provides an alternative to address this, detailed in the \texttt{double-projection.h} documentation.  
+The approximate projection method, as initially described, pertains to an algorithm where the discrete Laplace operator does not precisely equal the discrete divergence of the discrete gradient, according to Almgren (2000)\cite{2000_Almgren}. This situation arises exclusively on grids where only the cell-center is active, due to the misalignment caused by the face-centered vector. However, \texttt{Basilisk} circumvents this issue. Nonetheless, as previously discussed, while the face-centered velocity \para{$u_f$} maintains strict non-divergence, the cell-centered velocity \para{$u_c$} does not, as it is derived by subtracting the average of the updated pressure-acceleration at the face center. Consequently, this is why the projection method utilized by \texttt{Basilisk} is termed an approximate projection.
 
 \printbibliography
 \end{document}
