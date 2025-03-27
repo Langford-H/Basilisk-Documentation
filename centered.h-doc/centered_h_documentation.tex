@@ -68,7 +68,7 @@
 
 \maketitle
 \section{Introduction}
-This solver addresses the incompressible Navier-Stokes equations\cite{2003_Popinet,2015_Popinet}:
+This solver, implemented in \texttt{Basilisk}, addresses the incompressible Navier-Stokes equations \cite{2003_Popinet,2015_Popinet}:
 
 \begin{gather}
     \frac{\partial \mathbf{u}}{\partial t} 
@@ -81,25 +81,36 @@ This solver addresses the incompressible Navier-Stokes equations\cite{2003_Popin
 \end{gather}
 
 where the deformation tensor is defined as 
-$
-\mathbf{D} = \frac{1}{2} (\nabla \mathbf{u} + (\nabla \mathbf{u})^T)
-$.
+$\mathbf{D} = \frac{1}{2} (\nabla \mathbf{u} + (\nabla \mathbf{u})^T)$. The original conservative momentum equation is given by:
+\begin{equation}
+    \frac{\partial (\rho \mathbf{u})}{\partial t} 
+    + \nabla \cdot (\rho \mathbf{u} \otimes \mathbf{u}) 
+    = -\nabla p + \nabla \cdot (2\mu \mathbf{D}) 
+    + \mathbf{a}.
+\end{equation}
+Since \texttt{Basilisk} employs one-fluid method, the density $\rho$ varies across the domain. In two-phase flows with large density ratios, such as an air bubble in water, sharp gradients near the interface can induce oscillations, posing numerical challenges \cite{2021_Arrufat}. By combining the mass conservation equation,
+\begin{equation}
+    \frac{\partial \rho}{\partial t} 
+    + \nabla \cdot (\rho \mathbf{u}) = 0,
+\end{equation}
+the conservative momentum equation can be reformulated as Equation~\ref{equ:nseq1}, omitting the density gradient term.
 
-For multiphase flows, the acceleration term $\mathbf{a}$ includes the effects of interfacial forces, such as surface tension. With the incompressibility constraint in equation \ref{equ:nseq2}, the velocity $\mathbf{u}$ and pressure gradient $\nabla p$ at the next time step can be determined using approximate projection methods. The discrete form is:
+For multiphase flows, the acceleration $\mathbf{a}$ incorporates interfacial forces, such as surface tension. With the incompressibility constraint in Equation~\ref{equ:nseq2}, the velocity $\mathbf{u}$ and pressure gradient $\nabla p$ at the next time step are computed using approximate projection methods. The discrete form is:
 
 \begin{gather}
     \frac{\mathbf{u}^{n+1} - \mathbf{u}^n}{\Delta t} 
     + \nabla \cdot (\mathbf{u} \otimes \mathbf{u})^{n+1/2} 
     = \frac{1}{\rho^{n+1/2}} \left(-\nabla p^{n+1} 
-    + \nabla \cdot \left(2\mu^{n+1/2} \mathbf{D}^{**}\right)\right) 
+    + \nabla \cdot (2\mu^{n+1/2} \mathbf{D}^{**})\right) 
     + \mathbf{a}^{n+1/2}
     \label{equ:nseqdes1} \\
-    \nabla \cdot \mathbf{u}^{n+1} = 0 \label{equ:nseqdes2}
+    \nabla \cdot \mathbf{u}^{n+1} = 0 
+    \label{equ:nseqdes2}
 \end{gather}
 
-Here, the viscosity term is computed implicitly using the intermediate velocity $\mathbf{u}^{**}$.
+Here, the viscosity term is evaluated implicitly using an intermediate velocity $\mathbf{u}^{**}$.
 
-The following subsections will provide a theoretical overview of each step, with practical program analysis presented in subsequent sections. Notably, in the following subsections, face-centered variables will be denoted by the subscript $f$, such as $\mu_f$, to distinguish them from cell-centered variables. Readers are also referred to the excellent introduction written by Edoardo Cipriano \cite{2024_Cipriano}, which has been a great inspiration for this documentation.
+The following subsections provide a theoretical overview of each step, with practical implementation details discussed later. Face-centered variables, such as $\mu_f$, will be denoted with the subscript $f$ to distinguish them from cell-centered variables. Readers are referred to the excellent introduction by Edoardo Cipriano \cite{2024_Cipriano}, which greatly inspired this documentation.
 
 \subsection{Algorithm Overview}
 To summarize, solving the Navier-Stokes equations involves four main steps: \textbf{Property Update, Advection, Viscosity, and Projection}, corresponding to distinct stages of the solution process. The first three steps involve solving the following equations:
