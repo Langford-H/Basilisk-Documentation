@@ -1,0 +1,22 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage[active,tightpage]{preview}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{0.125pt}
+\usetikzlibrary[angles,quotes]
+
+\begin{document}
+\begin{tikzpicture}
+    \draw[step=1cm] (0,0) grid (2.0,2.0);
+    \filldraw (1,1) circle (0.05cm);
+    \foreach \x in {0.5,1.5}
+    {
+        \foreach \y in {0.5,1.5}
+        \filldraw[red] (\x,\y) circle (0.05cm);
+    }
+    \draw[->,thick] (1,1)--(0.5,1) node [above,font=\tiny] {$\nabla_x$};
+    \draw[->,thick] (0.5,1)--(0.5,0.5) node [anchor=west,font=\tiny] {$\nabla_y$};
+
+\end{tikzpicture}
+
+\end{document}

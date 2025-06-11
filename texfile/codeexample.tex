@@ -1,0 +1,50 @@
+\chapter{bcg.h Documentation}
+\chaptermeta[1.0][2025-01-01]
+\section{Introduction and Background}\label{sec:intro}
+
+\begin{codesection}{subsubsection}{Program Workflow}
+\codecomment{
+  \textbf{Starting Point}\\
+  \textbf{input}: \\
+  \para{f} = $\Phi^n$ \para{uf} = $u_f^{n+ \frac{1}{2}}$\\ \para{flux}(empty) \para{dt}=$\Delta t$\\ \para{src} = $ \mathbf{g}^n$\\
+  \textbf{gradient}:\\
+  \para{g} = $\nabla$ \para{f} = $\nabla \Phi$
+}
+
+\begin{minted}{cpp}
+void tracer_fluxes (scalar f,
+		    face vector uf,
+		    face vector flux,
+		    double dt,
+		    (const) scalar src)
+  vector g[];
+  gradients ({f}, {g});
+\end{minted}
+
+\codearrow
+
+\codecomment{
+  \textbf{Fluxes Compute}\\
+  Traversal each elements in \para{tracers} (if \para{tracers} is vector, then this step traversal component on every direction)\\
+  \textbf{computation}: \\
+  \para{flux} = $\Phi_f^{n + \frac{1}{2}} u_f^{n + \frac{1}{2}}$\\
+}
+
+\begin{minted}{cpp}
+  struct Advection {
+    scalar * tracers;
+    face vector u;
+    double dt;
+    scalar * src; // optional
+  };
+  void advection (struct Advection p)
+  {
+    scalar * lsrc = p.src;
+    if (!lsrc)
+      for (scalar s in p.tracers)
+        lsrc = list_append (lsrc, zeroc);
+    assert (list_len(p.tracers) == list_len(lsrc));
+\end{minted}
+
+\end{codesection}
+  

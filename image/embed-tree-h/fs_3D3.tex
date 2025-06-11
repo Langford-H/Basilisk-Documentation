@@ -1,0 +1,101 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage{tikz-3dplot}
+\usepackage[active,tightpage]{preview}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{0.125pt}
+%
+% File name: skew-polygon.tex
+% Description: 
+% A geometric representation of a skew polygon is shown.
+% 
+% Date of creation: October, 27th, 2021.
+% Date of last modification: October, 9th, 2022.
+% Author: Efra�n Soto Apolinar.
+% https://www.aprendematematicas.org.mx/author/efrain-soto-apolinar/instructing-courses/
+% Source: page 352 of the 
+% Glosario Ilustrado de Matem\'aticas Escolares.
+% https://tinyurl.com/5udm2ufy
+% English version: 
+% https://tinyurl.com/yayyxrbz
+% 
+% Terms of use: According to TikZ.net
+% https://creativecommons.org/licenses/by-nc-sa/4.0/
+% Your commitment to the terms of use is greatly appreciated.
+%
+\begin{document}
+%
+\tdplotsetmaincoords{75}{110}
+%
+\begin{tikzpicture}[tdplot_main_coords,scale=1.75]
+	\pgfmathsetmacro{\a}{3.0} % length
+	\pgfmathsetmacro{\h}{3.0}	% height
+	\pgfmathsetmacro{\n}{100}	% number of intervals
+	% Vertices of the box
+	\coordinate (O) at (0,0,0);
+	\coordinate (A) at (\a,0,0);
+	\coordinate (B) at (\a,\a,0);
+	\coordinate (C) at (0,\a,0);
+	\coordinate (D) at (0,0,\h);
+	\coordinate (E) at (\a,0,\h);
+	\coordinate (F) at (\a,\a,\h);
+	\coordinate (G) at (0,\a,\h);
+        
+        %Subcell points
+        \coordinate (o) at (0,0,\a/2);
+	\coordinate (a) at (0,\a,\a/2);
+	\coordinate (b) at (\a,\a,\a/2);
+	\coordinate (c) at (\a,0,\a/2);
+ 
+	\coordinate (d) at (0,\a/2,0);
+	\coordinate (e) at (0,\a/2,\a);
+	\coordinate (f) at (\a,\a/2,\a);
+	\coordinate (g) at (\a,\a/2,0);
+ 
+ 	\coordinate (O1) at (\a/2,\a/2,\a/2);
+	% First I draw the box
+	\draw[blue,thick,dashed] (O) -- (A) -- (B) -- (C) -- (O);	% plano z = 0
+	\draw[blue,thick,dashed] (O) -- (D);	% Edge on the $z$ axis 
+	\draw[blue,thick,dashed] (A) -- (E);	% vertical edge $(\a,0)$
+	\draw[blue,thick,dashed] (C) -- (G);	% vertical edge $(0,\a)$
+	% Edges of the external box
+	\draw[blue,thick,dashed] (D) -- (E) -- (F) -- (G) -- (D);	% Plane $z = \h$
+	\draw[blue,thick,dashed] (B) -- (F); % vertical edge $(\a,\a)$
+
+        %horizontal subcells
+        %middle
+        \draw[blue,thick,dashed] (o) -- (a) -- (b) -- (c) -- cycle;
+        \draw[blue,thick,dashed] (O1) --+ (0,-1.5,0) --+ (0,1.5,0);
+        \draw[blue,thick,dashed] (O1) --+ (-1.5,0,0) --+ (1.5,0,0);
+        
+        \draw[blue,thick,dashed] ($(O1)+(0,0,1.5)$) --+ (0,-1.5,0) --+ (0,1.5,0);
+        \draw[blue,thick,dashed] ($(O1)+(0,0,-1.5)$) --+ (0,-1.5,0) --+ (0,1.5,0);
+
+        \draw[blue,thick,dashed] ($(O1)+(0,1.5,1.5)$) --+ (0,0,-3);
+        \draw[blue,thick,dashed] ($(O1)+(0,-1.5,-1.5)$) --+ (0,0,3);
+        
+        %vertical subcells
+        \filldraw[fill = cyan, opacity = 0.5, blue, thick, dashed] (d) -- (e) -- (f) -- (g) -- cycle;
+        \draw[blue,thick,dashed] ($(O1)+(0,0,-1.5)$) --+ (0,0,3);
+        
+        \draw[blue,thick,dashed] (o) -- (a) -- (b) -- (c) -- cycle;
+
+
+
+        %AXI
+        \draw[->,thick](O1)node[below right]{$(0,0,0)$}--++(0,1.5,0)node[above right]{$(0.5,0,0)$}--++(0,0.5,0)node[below]{$X$};
+        \draw[->,thick](O1)--++(0,0,1.5)--++(0,0,0.5)node[right]{$Y$};
+        \draw[->,thick](O1)--++(1.5,0,0)--++(0.5,0,0)node[below]{$Z$};
+
+        %highlight selecting cube
+        \draw[red,thick] (O1) --++ (0,0,1.5) --++ (1.5,0,0) --++ (0,0,-1.5) -- cycle;
+        \draw[red,thick] (O1) --++ (0,1.5,0) --++ (1.5,0,0) --++ (0,-1.5,0);
+        \draw[red,thick] ($(O1)+(0,0,1.5)$) --++ (0,1.5,0) --++ (1.5,0,0) --++ (0,-1.5,0);
+        \draw[red,thick] ($(O1)+(0,1.5,0)$) --++ (0,0,1.5);
+        \draw[red,thick] ($(O1)+(1.5,1.5,0)$) --++ (0,0,1.5);
+
+
+
+\end{tikzpicture}
+%	
+\end{document}

@@ -1,0 +1,21 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage[active,tightpage]{preview}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{0.125pt}
+\usetikzlibrary[angles,quotes]
+
+\begin{document}
+\begin{tikzpicture}
+    \draw[step=1cm] (0,0) grid (2.0,2.0);
+    \filldraw (1,1) circle (0.05cm);
+    \foreach \x in {0.5,1.5}
+    {
+        \foreach \y in {0.5,1.5}
+        \pgfmathsetmacro{\xt}{\x*2-2}
+        \pgfmathsetmacro{\yt}{\y*2-2}
+        \filldraw[red] (\x,\y) circle (0.05cm) node[below,black,font=\tiny,scale=0.75] {$[\xt,\yt]$};
+    }
+\end{tikzpicture}
+
+\end{document}

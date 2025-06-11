@@ -1,0 +1,150 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage{tikz-3dplot}
+\usepackage{romannum}
+\usepackage[active,tightpage]{preview}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{0.125pt}
+\usetikzlibrary[angles,quotes]
+%\usetikzlibrary{calc,patterns,decorations.pathmorphing,decorations.markings,arrows}
+\definecolor{init}{RGB}{205,245,253}
+\definecolor{initb}{RGB}{87,108,188}
+\definecolor{S}{RGB}{251,161,183}
+\definecolor{Sb}{RGB}{230,62,109}
+\definecolor{iter}{RGB}{255,242,204}
+\definecolor{iterb}{RGB}{250,171,120}
+\definecolor{res}{RGB}{255,206,254}
+\definecolor{resn}{RGB}{214,123,255}
+
+\newcommand{\current}[2]
+{
+    \draw[red,very thick](#1-0.5,#2-0.5)--(#1+0.5,#2-0.5)--(#1+0.5,#2+0.5)--(#1-0.5,#2+0.5)--cycle;
+}
+
+\newcommand{\intecurr}[2]
+{
+    \draw[blue,very thick](#1-0.5,#2-0.5)--(#1+0.5,#2-0.5)--(#1+0.5,#2+0.5)--(#1-0.5,#2+0.5)--cycle;
+}
+
+\newcommand{\fcell}[2]
+{
+    \filldraw[gray,xshift=-0.5cm,yshift=-0.5cm](#1,#2) rectangle ++(1,1);
+}
+
+\newcommand{\surface}[2]
+{
+    \filldraw[gray,xshift=-0.5cm,yshift=-0.5cm](#1,#2)--(#1+1,#2)--(#1+1,#2+1)--cycle;
+}
+
+\newcommand{\funsqu}[6]%color(2) center(2) height width
+{
+    \coordinate(A) at (#3-0.5*#6,#4-0.5*#5);
+    \coordinate(B) at (#3+0.5*#6,#4+0.5*#5); 
+
+    \filldraw[rounded corners,#1,opacity=0.5] (A) rectangle (B);
+    \draw[thick,rounded corners,#2] (A) rectangle (B);
+}
+
+\begin{document}
+
+\tdplotsetmaincoords{70}{60}
+\begin{tikzpicture}
+    \surface{0}{0};
+    \current{0}{0};
+
+    \current{-2}{0};
+
+    \fcell{2}{0};
+    \current{2}{0};
+
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (1,1);
+
+    \funsqu{init}{initb}{-0.5}{-1.5}{1.5}{6.5};
+    \node[initb,rotate=90] at (-3.5,-1.5) {\Large initial};
+
+    \funsqu{S}{Sb}{-0.25}{-1.5}{0.5}{6};
+    \node[Sb] at (-3,-1.5) {S};
+
+    \foreach \x in {-2,0,2}
+    {
+        \draw[very thick](\x,-0.6)--(\x,-1.2);
+    }
+
+    \node[Sb] at (-2,-1.5) {$0$};
+    \node[Sb] at (0,-1.5) {$f_c$};
+    \node[Sb] at (2,-1.5) {$1$};
+
+    \funsqu{iter}{iterb}{3}{-5.0}{5}{14};
+    \funsqu{S}{Sb}{3}{-6.75}{0.5}{14};
+    \node[Sb] at (-3.75,-6.75) {S};
+    \node[iterb,rotate=90] at (-3.75,-3.5) {\Large iteration};
+
+%%%empty%%%
+    \surface{-2.6}{-4};
+    \fcell{-1.4}{-4};
+    
+    \intecurr{-2.6}{-4};
+    \intecurr{-1.4}{-4};
+    \intecurr{-2.6}{-5.5};
+
+    \draw[rounded corners,very thick](-2,-1.8)--(-2,-3)--(-2.6,-3)--(-2.6,-3.5) node [near end, anchor=east, yshift=1] {if};
+    \draw[rounded corners,very thick](-2,-1.8)--(-2,-3)--(-1.4,-3)--(-1.4,-3.5) node [near end, anchor=east, yshift=1] {if};
+    \draw[very thick](-2.6,-4.5)--(-2.6,-5.0)node[midway,anchor=east]{and};
+    \draw[very thick](-2.6,-6)--(-2.6,-6.5)node[iterb,anchor=east,yshift=0.15cm]{$D$};
+    \draw[very thick](-1.4,-4.5)--(-1.4,-6.5)node[iterb,anchor=east,yshift=0.15cm]{B};
+    
+    \draw[rounded corners,very thick](-2,-1.8)--(-2,-3)--(-0.5,-3)--(-0.5,-6.5) node [near end, anchor=east] {else};
+    
+    \node[Sb] at (-2.6,-6.75) {$0$};
+    \node[Sb] at (-1.4,-6.75) {$-1$};
+    \node[Sb] at (-0.5,-6.75) {$0$};
+
+%%%surface%%%
+    \surface{2.7}{-4};
+    \fcell{1.5}{-4};
+    
+    \intecurr{0.3}{-4};
+    \intecurr{1.5}{-4};
+    \intecurr{2.7}{-4};
+
+    \draw[rounded corners,very thick](0,-1.8)--(0,-3)--(0.3,-3)--(0.3,-3.5) node [near end, anchor=east, yshift=1] {if};
+
+    \draw[rounded corners,very thick](0,-1.8)--(0,-3)--(1.5,-3)--(1.5,-3.5) node [near end, anchor=east, yshift=1] {or};
+
+    \draw[rounded corners,very thick](0,-1.8)--(0,-3)--(2.7,-3)--(2.7,-3.5) node [near end, anchor=east, yshift=1] {else};
+
+    \draw[very thick](0.3,-4.5)--(0.3,-6.5)node[iterb,anchor=east,yshift=0.15cm]{A};
+
+    \draw[very thick](1.5,-4.5)--(1.5,-6.5)node[iterb,anchor=east,yshift=0.15cm]{A};
+
+    \draw[very thick](2.7,-4.5)--(2.7,-6.5);
+    
+    \node[Sb] at (0.3,-6.75) {$0$};
+    \node[Sb] at (1.5,-6.75) {$1$};
+    \node[Sb] at (2.7,-6.75) {$f_i$};
+    
+%%%full%%%
+    \surface{4}{-4};
+    \fcell{4.0}{-5.5};
+    
+    \intecurr{4.0}{-4};
+    \intecurr{5.2}{-4};
+    \intecurr{4.0}{-5.5};
+
+    \draw[rounded corners,very thick](2,-1.8)--(2,-2.2)--(4.6,-2.2)--(4.6,-3)--(4.0,-3)--(4.0,-3.5) node [near end, anchor=east, yshift=1] {if};
+    \draw[rounded corners,very thick](2,-1.8)--(2,-2.2)--(4.6,-2.2)--(4.6,-3)--(5.2,-3)--(5.2,-3.5) node [near end, anchor=east, yshift=1] {if};
+    \draw[very thick](4.0,-4.5)--(4.0,-5.0)node[midway,anchor=east]{and};
+    \draw[very thick](4,-6)--(4,-6.5)node[iterb,anchor=east,yshift=0.15cm]{$D$};
+    \draw[very thick](5.2,-4.5)--(5.2,-6.5)node[iterb,anchor=east,yshift=0.15cm]{C};
+    
+    \draw[rounded corners,very thick](2,-1.8)--(2,-2.2)--(4.6,-2.2)--(4.6,-3)--(6.1,-3)--(6.1,-6.5) node [near end, anchor=east] {else};
+
+    \node[Sb] at (4.0,-6.75) {$1$};
+    \node[Sb] at (5.2,-6.75) {$0$};
+    \node[Sb] at (6.1,-6.75) {$1$};
+\end{tikzpicture}
+
+\end{document}
+
+

@@ -1,0 +1,13 @@
+\documentclass[tikz]{standalone}
+\usepackage{tikz}
+\begin{document}
+\begin{tikzpicture}[scale=0.8]
+  \draw (-2.0,0)--(2.0,0)--(2.0,4)--(-2.0,4)--(-2.0,0);
+  \node[left=2pt](a) at (-2.0,2.0) {$1$};
+  \node[below=1pt](b) at (0,0) {$2$};
+  \node[right=1pt](c) at (2.0,2.0) {$3$};
+  \node[above=1pt](d) at (0,4.0) {$4$};
+  \draw[->] (-2.5,0)--(2.5,0) node[anchor=west]{$x$};
+  \draw[->] (-2.0,-0.5)--(-2.0,4.5) node[anchor=west]{$y$};
+\end{tikzpicture}
+\end{document}

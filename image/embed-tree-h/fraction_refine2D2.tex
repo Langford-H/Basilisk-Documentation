@@ -1,0 +1,25 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage[active,tightpage]{preview}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{0.125pt}
+\usetikzlibrary[angles,quotes]
+\definecolor{myblue}{rgb}{0.54, 0.81, 0.94}
+\definecolor{bluetext}{rgb}{0.01, 0.28, 1.0}
+\begin{document}
+\begin{tikzpicture}
+    \filldraw[gray,fill=gray,opacity=0.5,rotate around={270:(0,0)}](-1,-0.5)--(-1,-1)--(1,-1)--(1,1)--cycle;
+    \draw[->] (-1.2,0)--(1.2,0);
+    \draw[->] (0,-1.2)--(0,1.2);
+
+    \draw(-1,-1)--(-1,1)--(1,1)--(1,-1)--cycle;
+    \filldraw (0,0) circle (0.5pt) node[anchor=north east, scale=0.5] {\tiny$(0,0)$};
+    \filldraw (0,1) circle (0.5pt) node[anchor=north east, scale=0.5] {\tiny$(0,0.5)$};
+
+    \draw[thick,red,dashed](0,0)--(1,0)--(1,1)--(0,1)--cycle;
+    
+    \draw[->,blue] (0.25,0)--(0.5,3/16) node[black,right,scale=0.5,xshift=-22.5pt,yshift=5pt] {\tiny$\mathbf{n}=(-n_x,n_y)$};
+
+\end{tikzpicture}
+
+\end{document}

@@ -1,0 +1,12 @@
+\documentclass[tikz]{standalone}
+\usepackage{tikz}
+\begin{document}
+\begin{tikzpicture}[scale=1]
+     \draw (-2,0)--(2,0)--(2,4)--(-2,4)--(-2,0);
+     \node at (0,0) [anchor=north]{ $\Phi.y[i]$ };
+     \node at (-2,2) [anchor=west]{ $\Phi.x[i]$ };
+     \node at (2,2) [anchor=west]{ $\Phi.x[i+1]$ };
+     \node at (0,4) [anchor=north]{ $\Phi.y[i+1]$ };\
+     \node at (0,2) {$[i,j]$};
+\end{tikzpicture}
+\end{document}

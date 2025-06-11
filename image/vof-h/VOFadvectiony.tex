@@ -1,0 +1,22 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage[active,tightpage]{preview}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{0.125pt}
+\usetikzlibrary[angles,quotes]
+\definecolor{highlight}{rgb}{0.36, 0.54, 0.66}
+\begin{document}
+\begin{tikzpicture}
+    \filldraw[gray,opacity=0.5] (0,1.9)--(1.0,1.6)--(2.0,1.2)--(2.2,1)--(2.6,0)--(2.5,-1)--(0,-1)--cycle;
+    \draw[step=1cm] (0,-1) grid (3.0,2.0);
+    \filldraw[highlight,opacity=1](1.8,0)--(1.8,0.2)--(2.0,0.2)--(2.0,0)--cycle;
+    \draw[red,thick](1,0)--(2,0)--(2,1)--(1,1)--cycle;
+    \draw[->](1.5,0.2)--(1.5,0) node[scale=0.9,below]{\tiny$u_f.y[]$};
+    \draw[dashed](1,0.2)--(2,0.2);
+    \draw[->](1.5,0.8)--(1.5,1.0) node[scale=0.9,above]{\tiny$u_f.y[1]$};
+    \draw[dashed](1,0.8)--(2,0.8);
+    %\draw[dashed](1.8,1.0)--(1.8,0);
+    \node[scale=0.9] at (1.5,0.5) {\tiny$c^\ast$};
+\end{tikzpicture}
+
+\end{document}

@@ -1,0 +1,18 @@
+\documentclass[tikz]{standalone}
+\usepackage{tikz}
+\begin{document}
+\begin{tikzpicture}[scale=1.5]
+  \draw[step=1cm,thick] (0,0) grid (3.0,3.0);
+  \node at (1.5,1.5) {$C$};
+  \node at (2.5,1.5) {$E$};
+  \node at (0.5,1.5) {$W$};
+  \node at (1.5,2.5) {$N$};
+  \node at (0.5,2.5) {$WN$};
+  \node at (2.5,2.5) {$EN$};
+  \filldraw[blue] (1.0,1.5) circle (2pt);
+  \filldraw[blue] (2.0,1.5) circle (2pt);
+  \filldraw[blue] (1.0,2.5) circle (2pt);
+  \filldraw[blue] (2.0,2.5) circle (2pt);
+  \filldraw[red] (1.5,2.0) circle (2pt);
+\end{tikzpicture}
+\end{document}

@@ -1,0 +1,19 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage[active,tightpage]{preview}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{0.125pt}
+\usetikzlibrary[angles,quotes]
+\definecolor{myblue}{rgb}{0.54, 0.81, 0.94}
+\definecolor{bluetext}{rgb}{0.01, 0.28, 1.0}
+\begin{document}
+\begin{tikzpicture}
+    \filldraw[gray,opacity=0.5] (0,0)--(1,0.8)--(1,0)--cycle;
+    \draw[step=1cm] (0,0) grid (1.0,1.0);
+    \draw[red](0,0)--(1,0)--(1,1)--(0,1)--cycle;
+    \draw[dashed](0.5,1.0)--(0.5,0);
+    \filldraw[myblue,opacity=0.5](0.5,0.6)--(1,0.6)--(1,0)--(0.5,0)--cycle;
+    \node[bluetext] at (0.75,0.4) {$c_f$};
+\end{tikzpicture}
+
+\end{document}
