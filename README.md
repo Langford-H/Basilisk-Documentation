@@ -26,7 +26,7 @@ Based on our previous discussions, coherent documentation for Basilisk should in
 ### Incompressible solver 
 - [] centered solver
 	- [] [centered.h](./pdfoutput/centered-h.pdf)
-	- [] double-projection.h
+	- [] [double-projection.h](./pdfoutput/double-projection-h.pdf)
 		- [x] [viscosity.h](./pdfoutput/viscosity-h.pdf)
 		- [x] [poisson.h](./pdfoutput/poisson-h.pdf)
 		- [x] [bcg.h](./pdfoutput/bcg-h.pdf)
