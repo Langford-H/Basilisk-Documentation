@@ -1,48 +1,48 @@
 \relax 
 \providecommand\hyper@newdestlabel[2]{}
-\@writefile{toc}{\contentsline {chapter}{\numberline {3}poisson.h Documentation}{12}{chapter.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {4}poisson.h Documentation}{14}{chapter.4}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\newlabel{refsection:3}{{3}{12}{poisson.h Documentation}{chapter.3}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.1}Introduction and Background}{12}{section.3.1}\protected@file@percent }
-\newlabel{sec:poisson-intro}{{3.1}{12}{Introduction and Background}{section.3.1}{}}
-\newlabel{equ:poisson-cons}{{3.2}{12}{Introduction and Background}{equation.3.1.2}{}}
-\newlabel{equ:poisson-aim}{{3.3}{12}{Introduction and Background}{equation.3.1.3}{}}
-\newlabel{equ:poisson-iter}{{3.4}{12}{Introduction and Background}{equation.3.1.4}{}}
-\newlabel{fig:poisson-2dquad}{{3.1a}{13}{2D quadtree example}{figure.caption.12}{}}
-\newlabel{sub@fig:poisson-2dquad}{{a}{13}{2D quadtree example}{figure.caption.12}{}}
-\newlabel{fig:poisson-caculation}{{3.1b}{13}{Calculation for each level}{figure.caption.12}{}}
-\newlabel{sub@fig:poisson-caculation}{{b}{13}{Calculation for each level}{figure.caption.12}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.1}{\ignorespaces Quadtree example. Arrow in (b) indicates calculating sequence.}}{13}{figure.caption.12}\protected@file@percent }
-\newlabel{fig:poisson-2dexample}{{3.1}{13}{Quadtree example. Arrow in (b) indicates calculating sequence}{figure.caption.12}{}}
-\newlabel{equ:poisson-indirect}{{3.6}{14}{Introduction and Background}{equation.3.1.6}{}}
-\newlabel{equ:poisson-poisson}{{3.7}{14}{Introduction and Background}{equation.3.1.7}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.2}{\ignorespaces Architecture of the solver. Nested relationship of functions is indicated by box containing relationship \emph  {e.g.} \textbf  {\textcolor {function}{mg\_cycle}} contains \textbf  {\textcolor {function}{relax}} but not \textbf  {\textcolor {function}{residual}} indicates that \textbf  {\textcolor {function}{relax}} is called in \textbf  {\textcolor {function}{mg\_cycle}} while \textbf  {\textcolor {function}{residual}} is called in \textbf  {\textcolor {function}{mg\_solve}}.}}{15}{figure.caption.13}\protected@file@percent }
-\newlabel{fig:poisson-workflow}{{3.2}{15}{Architecture of the solver. Nested relationship of functions is indicated by box containing relationship \emph {e.g.} \func {mg\_cycle} contains \func {relax} but not \func {residual} indicates that \func {relax} is called in \func {mg\_cycle} while \func {residual} is called in \func {mg\_solve}}{figure.caption.13}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.3}{\ignorespaces Combination between \textbf  {\textcolor {function}{mg\_cycle}} and \textbf  {\textcolor {function}{relax}}. The 'round' of iteration described before is also demonstrated in a detailed way. \textbf  {\textcolor {function}{relax}} herein is embed into every level of the mesh and is executed several times (depends on parameter $n$) on each level to accelerate convergence.}}{16}{figure.caption.14}\protected@file@percent }
-\newlabel{fig:poisson-mgcycle}{{3.3}{16}{Combination between \func {mg\_cycle} and \func {relax}. The 'round' of iteration described before is also demonstrated in a detailed way. \func {relax} herein is embed into every level of the mesh and is executed several times (depends on parameter $n$) on each level to accelerate convergence}{figure.caption.14}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.2}Multigrid Solver}{16}{section.3.2}\protected@file@percent }
-\newlabel{sec:poisson-mgsolver}{{3.2}{16}{Multigrid Solver}{section.3.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.1}\textbf  {\textcolor {function}{mg\_cycle}}}{16}{subsection.3.2.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Parameters}{16}{subsubsection*.15}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Worth Mentioning Details}{16}{subsubsection*.16}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.2}\textbf  {\textcolor {function}{mg\_solve}}}{17}{subsection.3.2.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Parameters}{17}{subsubsection*.17}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Worth Mentioning Details}{17}{subsubsection*.18}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.3}Poisson-Helmholtz solver}{17}{subsection.3.2.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.4}Poisson structure}{17}{subsection.3.2.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Parameters}{17}{subsubsection*.19}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Worth Mentioning Details}{18}{subsubsection*.20}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.5}\textbf  {\textcolor {function}{relax}}}{18}{subsection.3.2.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Parameters}{18}{subsubsection*.21}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Worth Mentioning Details}{18}{subsubsection*.22}\protected@file@percent }
-\newlabel{equ:poisson-relax}{{3.9}{18}{Worth Mentioning Details}{equation.3.2.9}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.6}\textbf  {\textcolor {function}{residual}}}{18}{subsection.3.2.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Parameters}{18}{subsubsection*.23}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Worth Mentioning Details}{19}{subsubsection*.24}\protected@file@percent }
-\newlabel{align:res}{{3.11}{19}{Worth Mentioning Details}{equation.3.2.11}{}}
+\newlabel{refsection:4}{{4}{14}{poisson.h Documentation}{chapter.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.1}Introduction and Background}{14}{section.4.1}\protected@file@percent }
+\newlabel{sec:poisson-intro}{{4.1}{14}{Introduction and Background}{section.4.1}{}}
+\newlabel{equ:poisson-cons}{{4.2}{14}{Introduction and Background}{equation.4.1.2}{}}
+\newlabel{equ:poisson-aim}{{4.3}{14}{Introduction and Background}{equation.4.1.3}{}}
+\newlabel{equ:poisson-iter}{{4.4}{14}{Introduction and Background}{equation.4.1.4}{}}
+\newlabel{fig:poisson-2dquad}{{4.1a}{15}{2D quadtree example}{figure.caption.12}{}}
+\newlabel{sub@fig:poisson-2dquad}{{a}{15}{2D quadtree example}{figure.caption.12}{}}
+\newlabel{fig:poisson-caculation}{{4.1b}{15}{Calculation for each level}{figure.caption.12}{}}
+\newlabel{sub@fig:poisson-caculation}{{b}{15}{Calculation for each level}{figure.caption.12}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.1}{\ignorespaces Quadtree example. Arrow in (b) indicates calculating sequence.}}{15}{figure.caption.12}\protected@file@percent }
+\newlabel{fig:poisson-2dexample}{{4.1}{15}{Quadtree example. Arrow in (b) indicates calculating sequence}{figure.caption.12}{}}
+\newlabel{equ:poisson-indirect}{{4.6}{16}{Introduction and Background}{equation.4.1.6}{}}
+\newlabel{equ:poisson-poisson}{{4.7}{16}{Introduction and Background}{equation.4.1.7}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.2}{\ignorespaces Architecture of the solver. Nested relationship of functions is indicated by box containing relationship \emph  {e.g.} \textbf  {\textcolor {function}{mg\_cycle}} contains \textbf  {\textcolor {function}{relax}} but not \textbf  {\textcolor {function}{residual}} indicates that \textbf  {\textcolor {function}{relax}} is called in \textbf  {\textcolor {function}{mg\_cycle}} while \textbf  {\textcolor {function}{residual}} is called in \textbf  {\textcolor {function}{mg\_solve}}.}}{17}{figure.caption.13}\protected@file@percent }
+\newlabel{fig:poisson-workflow}{{4.2}{17}{Architecture of the solver. Nested relationship of functions is indicated by box containing relationship \emph {e.g.} \func {mg\_cycle} contains \func {relax} but not \func {residual} indicates that \func {relax} is called in \func {mg\_cycle} while \func {residual} is called in \func {mg\_solve}}{figure.caption.13}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.3}{\ignorespaces Combination between \textbf  {\textcolor {function}{mg\_cycle}} and \textbf  {\textcolor {function}{relax}}. The 'round' of iteration described before is also demonstrated in a detailed way. \textbf  {\textcolor {function}{relax}} herein is embed into every level of the mesh and is executed several times (depends on parameter $n$) on each level to accelerate convergence.}}{18}{figure.caption.14}\protected@file@percent }
+\newlabel{fig:poisson-mgcycle}{{4.3}{18}{Combination between \func {mg\_cycle} and \func {relax}. The 'round' of iteration described before is also demonstrated in a detailed way. \func {relax} herein is embed into every level of the mesh and is executed several times (depends on parameter $n$) on each level to accelerate convergence}{figure.caption.14}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.2}Multigrid Solver}{18}{section.4.2}\protected@file@percent }
+\newlabel{sec:poisson-mgsolver}{{4.2}{18}{Multigrid Solver}{section.4.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2.1}\textbf  {\textcolor {function}{mg\_cycle}}}{18}{subsection.4.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Parameters}{18}{subsubsection*.15}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Worth Mentioning Details}{18}{subsubsection*.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2.2}\textbf  {\textcolor {function}{mg\_solve}}}{19}{subsection.4.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Parameters}{19}{subsubsection*.17}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Worth Mentioning Details}{19}{subsubsection*.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2.3}Poisson-Helmholtz solver}{19}{subsection.4.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2.4}Poisson structure}{19}{subsection.4.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Parameters}{19}{subsubsection*.19}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Worth Mentioning Details}{20}{subsubsection*.20}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2.5}\textbf  {\textcolor {function}{relax}}}{20}{subsection.4.2.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Parameters}{20}{subsubsection*.21}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Worth Mentioning Details}{20}{subsubsection*.22}\protected@file@percent }
+\newlabel{equ:poisson-relax}{{4.9}{20}{Worth Mentioning Details}{equation.4.2.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2.6}\textbf  {\textcolor {function}{residual}}}{20}{subsection.4.2.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Parameters}{20}{subsubsection*.23}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Worth Mentioning Details}{21}{subsubsection*.24}\protected@file@percent }
+\newlabel{align:res}{{4.11}{21}{Worth Mentioning Details}{equation.4.2.11}{}}
 \@setckpt{texfile/poisson-h}{
-\setcounter{page}{21}
+\setcounter{page}{23}
 \setcounter{equation}{11}
 \setcounter{enumi}{3}
 \setcounter{enumii}{0}
@@ -51,7 +51,7 @@
 \setcounter{footnote}{0}
 \setcounter{mpfootnote}{1}
 \setcounter{part}{0}
-\setcounter{chapter}{3}
+\setcounter{chapter}{4}
 \setcounter{section}{2}
 \setcounter{subsection}{6}
 \setcounter{subsubsection}{0}
@@ -62,7 +62,7 @@
 \setcounter{parentequation}{0}
 \setcounter{FancyVerbLine}{3}
 \setcounter{linenumber}{1}
-\setcounter{LN@truepage}{20}
+\setcounter{LN@truepage}{22}
 \setcounter{FancyVerbWriteLine}{0}
 \setcounter{FancyVerbBufferIndex}{0}
 \setcounter{FancyVerbBufferLength}{0}
@@ -85,7 +85,7 @@
 \setcounter{section@level}{0}
 \setcounter{Item}{3}
 \setcounter{Hfootnote}{1}
-\setcounter{bookmark@seq@number}{21}
+\setcounter{bookmark@seq@number}{24}
 \setcounter{tabx@nest}{0}
 \setcounter{listtotal}{0}
 \setcounter{listcount}{0}
@@ -105,7 +105,7 @@
 \setcounter{savedcitecounter}{0}
 \setcounter{uniquelist}{0}
 \setcounter{uniquename}{0}
-\setcounter{refsection}{3}
+\setcounter{refsection}{4}
 \setcounter{refsegment}{0}
 \setcounter{maxextratitle}{0}
 \setcounter{maxextratitleyear}{0}
@@ -117,7 +117,7 @@
 \setcounter{lownamepenalty}{25}
 \setcounter{maxparens}{3}
 \setcounter{parenlevel}{0}
-\setcounter{blx@maxsection}{3}
+\setcounter{blx@maxsection}{4}
 \setcounter{mincomprange}{10}
 \setcounter{maxcomprange}{100000}
 \setcounter{mincompwidth}{1}

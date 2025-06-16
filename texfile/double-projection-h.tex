@@ -1,0 +1,38 @@
+\chapter{double-projection.h Documentation}
+\ifsingle
+\maketitle
+\fi
+\chaptermeta[1.0][2025-06-14]
+
+\section{Introduction}
+This header file provides a method to update the velocity and pressure gradient separately, mitigating error accumulation in the pressure gradient due to a non-strictly divergence-free cell-centered velocity. This approach requires an additional projection step.
+
+As discussed in the documentation for \texttt{centered.h}, the cell-centered velocity $\mathbf{u}^n$ is not strictly divergence-free. This is because it is computed by interpolating the source term (comprising acceleration and pressure gradient), which complements the strictly divergence-free face-centered velocity. Consequently, when updating the pressure gradient $\nabla p$ in the next time step by solving the Poisson equation for $\mathbf{u}^{***}$, defined as
+
+\begin{equation}
+\mathbf{u}^{***} = \mathbf{u}^n - \Delta t \nabla \cdot (\mathbf{u} \otimes \mathbf{u})^{n+1/2}
++ \frac{\Delta t}{\rho^{n+1/2}} \nabla \cdot \left( 2 \mu^{n+1/2}_f \mathbf{D}^{**} \right),
+\end{equation}
+
+the non-divergence-free error in $\mathbf{u}^n$ accumulates, as $\mathbf{u}^{***}$ includes $\mathbf{u}^n$. As reported on the \texttt{Basilisk} website, this issue can be significant under certain conditions.
+
+\section{Solution Approach}
+To address this issue, we exclude $\mathbf{u}^n$ from $\mathbf{u}^{***}$ as therotically it satisfies $\nabla \cdot \mathbf{u}^n = 0$. The pressure gradient $\nabla p$ is then computed by solving
+
+\begin{equation}
+\nabla^2 p^{n+1} = \nabla \cdot \left[ -\Delta t \nabla \cdot (\mathbf{u} \otimes \mathbf{u})^{n+1/2}
++ \frac{\Delta t}{\rho^{n+1/2}} \nabla \cdot \left( 2 \mu^{n+1/2}_f \mathbf{D}^n \right) \right].
+\end{equation}
+
+To maintain a divergence-free velocity field, an additional projection iteration is required. The velocity update process is now defined as follows:
+
+\begin{gather}
+\frac{\rho^{n+1/2}}{\Delta t} \left( \mathbf{u}^{**} - \mathbf{u}^n \right)
++ \rho^{n+1/2} \left[ \nabla \cdot (\mathbf{u} \otimes \mathbf{u})^{n+1/2}
++ \frac{\nabla p^n}{\rho^{n-1/2}} \right]
+= \nabla \cdot \left( 2 \mu^{n+1/2}_f \mathbf{D}^{n+1/2} \right), \label{eq:velocity_update} \\
+\nabla^2 \delta p = \nabla \cdot \mathbf{u}^{**}, \quad \mathbf{u}^{n+1/2} = \mathbf{u}, \label{eq:poisson_delta_p} \\
+\mathbf{u}^{n+1} = \mathbf{u}^{**} - \frac{\Delta t}{\rho^{n+1/2}} \nabla \delta p^n, \label{eq update}
+\end{gather}
+
+where $\delta p$ is the temporary pressure gradient to correct the velocity field.

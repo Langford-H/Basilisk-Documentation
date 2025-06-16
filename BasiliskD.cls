@@ -67,7 +67,7 @@
 % -------------------
 \definecolor{codebg}{RGB}{230,255,253}   % Background for code blocks
 \definecolor{function}{RGB}{210,0,26}    % Function names
-\definecolor{para}{RGB}{255,137,137}     % Parameters déficité
+\definecolor{para}{RGB}{255,137,137}     % Parameters
 \definecolor{output}{RGB}{238,224,201}   % Output blocks
 
 \newcommand{\target}{\tikz \fill[brown] (2pt,2pt) rectangle (8pt,8pt);}
