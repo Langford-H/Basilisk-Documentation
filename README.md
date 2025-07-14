@@ -70,5 +70,13 @@ Based on our previous discussions, coherent documentation for Basilisk should in
 ## Compiler
 - [] ast
 
+## Introduction to the `.cls` File
+I created a `.cls` file as a template for the documentation. This template can be used by declaring `\documentclass{BasiliskD}`. The class provides three options:  
+- `single`: determines whether the document is displayed as a single chapter or as a full book.  
+- `hidecode`: controls whether code blocks and their corresponding explanations are shown.  
+- `bibpath`: specifies the exact path to the bibliography file.
+
+With these settings, users can either read a coherent algorithmic book in [book](./Basilisk-Doc.pdf), where the detailed code blocks are omitted, or consult the documentation of each header file—complete with coding details—individually in the [directory](./pdfoutput/).
+
 # Contact
 [My sandbox](basilisk.fr/sandbox/HCH/README) and feel free to email me: dahuanghhc@gmail.com

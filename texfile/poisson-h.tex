@@ -83,9 +83,9 @@ As indicated in section \ref{sec:poisson-intro}, we here first introduce general
     \hline\hline
     \rowcolor{output}\para{a} & scalar* & update & compulsory & $ \mathbf{x}^{k}/ \mathbf{x}^{k+1}$\\
     \hline
-    \para{res} & scalar* & unchanged & compulsory & $ \delta \mathbf{x}^k$\\
+    \para{res} & scalar* & unchanged & compulsory & $ RES^k $\\
     \hline
-    \para{da} & scalar* & unchanged & compulsory & $\rho^{n+ \frac{1}{2}}$\\
+    \para{da} & scalar* & unchanged & compulsory & $ \delta \mathbf{x}^k $\\
     \hline
     \para{relax} & void* & unchanged & compulsory &  \func{relax}\\
     \hline
@@ -205,6 +205,7 @@ void mg_cycle (scalar * a, scalar * res, scalar * da,
   \end{tabular}
 \end{center}
 \subsubsection{Worth Mentioning Details}
+The variable $\delta x$ is initialized in the current function and passed to \func{mg\_cycle} for updates. According to the superposition principle, the boundary condition for $\delta x$ must be homogeneous in order to satisfy the boundary conditions of the original variable $x$. This requirement is enforced in the function using the postfix '\_homogeneous'. For more details, see the documentation on \href{http://basilisk.fr/Basilisk%20C#homogeneous-boundary-conditions}{homogeneous boundary conditions}.\par
 Two optional components \func{residual} and \func{relax} are input as void pointer in this function. The return of this function is of self-defined data structure 'mgstats' which indeed contains information of the whole multigrid circle. The information includes \para{i}: the total number \func{mg\_cycle} is employed inside \func{mg\_solve}, \para{resb} and \para{resa}: maximum residual before/after the cycle.
 
 \begin{codesection}{subsubsection}{Program Workflow}
