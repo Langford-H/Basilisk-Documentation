@@ -1,0 +1,17 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage[active,tightpage]{preview}
+\usetikzlibrary{arrows.meta}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{0.125pt}
+
+\begin{document}
+\begin{tikzpicture}
+    \draw (-2,0)--(2,0)--(2,4)--(-2,4)--(-2,0);
+    \filldraw[gray] (-2,0)--(-2,3)--(2,1)--(2,0)--(-2,0);
+    \draw[-{Classical TikZ Rightarrow[length=1.5mm]}] (-2.5,2)--(2.5,2) node[anchor=north]{$X$};
+    \draw[-{Classical TikZ Rightarrow[length=1.5mm]}] (0,-0.5)--(0,4.5) node[anchor=west]{$Y$};
+    \draw[-latex](0,2)--(0.5,3) node[anchor=west]{$\mathbf{n}$};
+\end{tikzpicture}
+
+\end{document}
