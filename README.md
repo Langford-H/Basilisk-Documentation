@@ -72,7 +72,6 @@ Based on our previous discussions, coherent documentation for Basilisk should in
 - [] ast
 
 ## Introduction to the `.cls` File
-## Introduction to the `.cls` File
 
 A custom `.cls` file has been created as a template for this documentation. To use it, simply declare `\documentclass{BasiliskD}` in your LaTeX source. The class supports three customizable options:
 
