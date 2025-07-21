@@ -1,0 +1,35 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage[active,tightpage]{preview}
+\usetikzlibrary{arrows.meta}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{0.125pt}
+
+\definecolor{dilation}{rgb}{0.54, 0.81, 0.94}
+
+\begin{document}
+\begin{tikzpicture}[rotate=90,yscale=-1]
+    %basic
+    \filldraw[gray,opacity=0.5] (1,-1)--(2,1)--(2.5,2)--(0,2)--(0,-3)--cycle;
+    \filldraw[gray] (0,-1)--(0,-3)--(1,-1)--cycle;
+    \draw[step=1cm] (0,-1) grid (3.0,2.0);
+    \draw[red,thick](1,0)--(2,0)--(2,1)--(1,1)--cycle;
+    \draw[-{Classical TikZ Rightarrow[length=1.5mm]}] (-0.5,-1)--(3.5,-1) node[anchor=west]{$Y$};
+    \draw[-{Classical TikZ Rightarrow[length=1.5mm]}] (0,-1.5)--(0,2.5) node[anchor=north]{$X$};
+
+    %slope
+    \draw[thick, dilation] (2,1.75)--(3,1.75);
+    \draw[thick, dilation] (0,-1)--(1,-1);
+    \draw (2.375,1.75) circle (0.5mm);
+    \draw (0.5,-1) circle (0.5mm);
+    \draw[thick] (0.5,-1)--(2.375,1.75);
+
+    %correction
+    \draw[dashed,thick, dilation] (0,-2)--(1,-2);
+    \draw (0.5,-2) circle (0.5mm);
+    \draw[dashed, thick] (0.5,-2)--(2.375,1.75);
+
+\end{tikzpicture}
+
+\end{document}
+
