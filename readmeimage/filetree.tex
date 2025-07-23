@@ -1,0 +1,80 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage[active,tightpage]{preview}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{0.125pt}
+\usetikzlibrary[angles,quotes,shapes]
+\definecolor{expertc}{RGB}{134,182,246}
+\definecolor{understc}{RGB}{180,212,255}
+\definecolor{knowc}{RGB}{238,245,255}
+
+\tikzstyle{expert}=[
+rectangle, draw, fill = expertc, expertc, text centered, rounded corners, text = black, font = \scriptsize
+]
+\tikzstyle{underst}=[
+rectangle, draw, fill = understc, understc, text centered, rounded corners, text = black, font = \scriptsize
+]
+\tikzstyle{know}=[
+rectangle, draw, fill = knowc, knowc, text centered, rounded corners, text = black, font = \scriptsize
+]
+
+\tikzstyle{line}=[draw, ->]
+\begin{document}
+\begin{tikzpicture}
+%%NS solver
+\draw[rounded corners] (2.5,0.5) rectangle (-2.5,-2.5);
+\node[anchor = west] at (-2.5,-2.25) {NS solver};
+\node[underst] (dproject) {double-project.h};
+\node[underst, below of = dproject, node distance = 0.75cm] (centered) {centered.h};
+\node[expert,below of = centered, node distance = 0.75cm] (bcg) {bcg.h};
+\node[expert,right of = bcg, node distance = 1.5cm] (poisson) {poisson.h};
+\node[expert,left of = bcg, node distance = 1.5cm] (viscosity) {viscosity.h};
+\node[know, below of = bcg, node distance = 0.75cm] (tracer) {tracers.h};
+
+\path[line] (centered)--(dproject);
+\path[line] (centered)--(bcg);
+\path[line] (bcg)--(tracer);
+\path[line] (centered)-|(viscosity);
+\path[line] (centered)-|(poisson);
+
+%%Multiphase
+\draw[rounded corners] (-2.5,-3) rectangle (4.0,-6);
+\node[anchor=west] at (-2.5,-5.75) {Multiphase};
+\node[expert] (geo) at (-1.5,-3.5) {geometry.h};
+\node[expert, below of = geo, node distance = 0.5cm] (frac) {fraction.h};
+\node[underst, right of = frac, node distance = 2.5cm] (myc) {myc2d.h \& myc.h};
+\node[expert, right of = geo, node distance = 2.0cm] (vof) {vof.h};
+\node[underst, right of = vof, node distance = 2.0cm] (twog) {two-phase-generic.h};
+\path[line] (geo)--(vof);
+\path[line] (vof)--(twog);
+\draw(frac) -- ++(1cm,0) -- +(0,0.5cm);
+\draw(myc) -- (frac);
+
+\node[know, below of = frac, node distance = 0.625cm] (parabola) {parabola.h};
+\node[expert, below of = parabola, node distance = 0.5cm] (height) {heights.h};
+\node[underst, right of = parabola, node distance = 2.0cm] (curvature) {curvature.h};
+\node[underst, below of = curvature, node distance = 0.5cm] (iforce) {iforce.h};
+\node[underst, right of = curvature, node distance = 2.0cm] (tension) {tension.h};
+
+\path[line] (parabola) -- (curvature);
+\path[line] (curvature) -- (tension);
+\draw(height) -- ++(1cm,0) -- +(0,0.5cm);
+\draw(iforce) -- ++(1cm,0) -- +(0,0.5cm);
+
+%%cut cell
+\draw[rounded corners] (3.0,0.5) rectangle (6.5,-2.5);
+\node[anchor=west] at (3.0,-2.25) {Cut Cell};
+\node[underst] (embedtree) at (4.75,0) {embed-tree.h};
+\node[underst, below of = embedtree, node distance = 0.75cm] (embed) {embed.h};
+\node[know, below of = embed, node distance = 0.75cm] (embedv) {viscosity-embed.h};
+\path[line](embedtree)--(embed);
+\path[line](embed)--(embedv);
+
+%%symbol
+\filldraw[expert] (4.25,-3.5) rectangle (4.5,-3.25) node[right,yshift=-0.125cm] {Finished};
+
+\filldraw[underst] (4.25,-4.5) rectangle (4.5,-4.25) node[right,yshift=-0.125cm] {Under Construction};
+
+\filldraw[underst] (4.25,-5.5) rectangle (4.5,-5.25) node[right,yshift=-0.125cm] {Prepared};
+\end{tikzpicture}
+\end{document}

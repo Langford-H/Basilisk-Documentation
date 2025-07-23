@@ -1,5 +1,5 @@
 # Basilisk Documentation
-This is a Documentation for PDE solver [Basilisk](http://basilisk.fr/) written by Haochen Huang, a master candidate in XJTU.
+This is a Documentation for PDE solver [Basilisk](http://basilisk.fr/) written by Haochen Huang.
 
 The doc is written for those who are interested in how things work inside Basilisk and want to alter the solver.
 
@@ -41,7 +41,7 @@ Based on our previous discussions, coherent documentation for Basilisk should in
 		- [x] [vof.h](./pdfoutput/vof-h.pdf)
 			- [] fractions.h
 			- [] geometry.h
-			- [] myc.h & myc2d.h
+			- [] [myc.h & myc2d.h](./pdfoutput/myc-h-and-myc2d-h.pdf)
 	- [] iforce.h
 		- [] curvature.h
 			- [] [heights.h](./pdfoutput/heights-h.pdf)
@@ -85,4 +85,4 @@ If you'd like to create your own documentation, you can start from this [LaTeX e
 
 
 # Contact
-[My sandbox](basilisk.fr/sandbox/HCH/README) and feel free to email me: dahuanghhc@gmail.com
+[My sandbox](http://basilisk.fr/sandbox/HCH/README) and feel free to email me: dahuanghhc@gmail.com
