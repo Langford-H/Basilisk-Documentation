@@ -13,14 +13,14 @@ In the following sections, I will first introduce the basic concept of represent
 \subsubsection{Linear Representation of the Interface}
 
 Consider an interfacial cell on a 2D plane, as shown in figure \ref{fig:myc-2Dlinear}. Let the normal direction of the interface be denoted by $\mathbf{n} = (n_x, n_y)$. It is straightforward to show that the interface can be represented by the linear equation
-\begin{equation}{equ:myc-original}
+\begin{equation}\label{equ:myc-original}
   n_x X + n_y Y = \alpha,
 \end{equation}
 where $\alpha$ is a constant that determines the position of the interface.
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
-    \includegraphics[height=6cm]{./image/myc-h-and-myc2d-h/2Dlinear-face.pdf}
+    \includegraphics[height=5.5cm]{./image/myc-h-and-myc2d-h/2Dlinear-face.pdf}
     \caption{Linear representation of the interface, with normal direction $\mathbf{n} = (n_x, n_y)$.}
     \label{fig:myc-2Dlinear}
 \end{figure}
@@ -48,17 +48,17 @@ The centered columns scheme adopts the same idea but operates under discrete con
   \item Since there are two slope estimates, which one should be selected?
 \end{enumerate}
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \begin{subfigure}[t]{0.45\textwidth}
         \centering
-        \includegraphics[height=5cm]{./image/myc-h-and-myc2d-h/centered-a.pdf}
+        \includegraphics[height=5.5cm]{./image/myc-h-and-myc2d-h/centered-a.pdf}
         \subcaption{}
         \label{fig:myc-centered-a}
     \end{subfigure}
     \begin{subfigure}[t]{0.45\textwidth}
         \centering
-        \includegraphics[height=5cm]{./image/myc-h-and-myc2d-h/centered-b.pdf}
+        \includegraphics[height=5.5cm]{./image/myc-h-and-myc2d-h/centered-b.pdf}
         \subcaption{}
         \label{fig:myc-centered-b}
     \end{subfigure}
@@ -79,5 +79,32 @@ Figure \ref{fig:myc-centered-b} presents the same scenario but treats $Y$ as the
 
 Based on this observation, the normal direction is chosen as $(-m_x, sign(m_y))$ when $|m_y| > |m_x|$, and as $(sign(m_x), -m_y)$ otherwise.
 
-\printbibliography
+\subsubsection{Young's Scheme}
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=5.5cm]{./image/myc-h-and-myc2d-h/Youngs.pdf}
+  \caption{Illustration of Young's scheme. The interface normal is obtained by averaging the normals at four cell corners, indicated by empty circles. Blue shading marks the cells involved in the final algebraic expression, with dark blue showing overlaps.}
+  \label{fig:myc-young}
+\end{figure}
+
+Young's scheme estimates the interface normal vector $\mathbf{n}$ by averaging the normals computed at four cell corners. As shown in figure \ref{fig:myc-young}, the normal at each corner is evaluated using central differences of the surrounding cell values. For example, considering the target cell with index $(0,0)$, the $x$-component of the normal at corner $(1/2, 1/2)$ is given by
+\begin{equation}
+  n_{x,(1/2,1/2)} = \frac{1}{2\Delta}\left(c_{1,1} + c_{1,0} - c_{0,1} - c_{0,0}\right)
+\end{equation}
+The average $x$-component of the normal over all four corners is then computed as
+\begin{equation}
+  n_x = \frac{1}{4} \left(n_{x,(1/2,1/2)} + n_{x,(-1/2,1/2)} + n_{x,(1/2,-1/2)} + n_{x,(-1/2,-1/2)} \right)
+\end{equation}
+
+Alternatively, a more compact expression for $n_x$ can be obtained by directly summing the contributions from relevant cells:
+\begin{equation}
+  n_x = \frac{1}{8} \left(C_1 - C_{-1}\right)
+\end{equation}
+where
+\begin{equation*}
+  C_1 = c_{1,1} + 2c_{1,0} + c_{1,-1}, \quad C_{-1} = c_{-1,1} + 2c_{-1,0} + c_{-1,-1}
+\end{equation*}
+as indicated by the blue regions in figure \ref{fig:myc-young}. The same procedure applies for computing $n_y$. Note that the coefficient $\frac{1}{8}$ may be omitted or replaced, provided both components of $\mathbf{n}$ are scaled consistently.
+
+\printbibliography
