@@ -5,7 +5,7 @@
 \chaptermeta[1.0][2025-06-07]
 
 \section{Introduction}
-\textbf{vof.h} aims to solve advection equation
+\texttt{vof.h} aims to solve advection equation
 \begin{equation}\label{equ:advec}
     \frac{\partial c_{i}}{\partial t} + \mathbf{u}\cdot\nabla c_{i} = 0
 \end{equation}
@@ -172,7 +172,7 @@ static void vof_concentration_refine (Point point, scalar s)
 \section{Advection Solution}
 The exact solution is introduced in this section. Before diving into details, the conception of VOF method and major problem confronted in this method shall be discussed first.
 \subsection{VOF method}
-Generally speaking, there are two steps to accomplish VOF method i.e. advection of volume fraction and reconstruction of surface. The latter one is tackled in headfile \textbf{geometry.h} and will not be covered in this document.\par
+Generally speaking, there are two steps to accomplish VOF method i.e. advection of volume fraction and reconstruction of surface. The latter one is tackled in headfile \texttt{geometry.h} and will not be covered in this document.\par
  The integral form of equation \ref{equ:advec} is
 \begin{equation}
     \Delta^{d} c_i|^{n+1}_{n} + \int_{\Omega}\mathbf{u}_f\cdot\nabla c_i= 0
@@ -341,7 +341,7 @@ static void sweep_x (scalar c, scalar cc, scalar * tcl)
   \textbf{Interface reconstruction}:\\
   Before computing the flux, the interface is reconstructed exclusively based on distribution of $c$.\\
   \textbf{Flux computation}:\\
-  The face velocity \para{uf.x[]} is first calculated and stored in \para{un} as CFL number. After update the CFL number to its largest value, the partial fraction is computed by tool from \textbf{geometry.h} from 'upwinded' cell and stored in \para{cf}. The flux is therefore obtained as\\
+  The face velocity \para{uf.x[]} is first calculated and stored in \para{un} as CFL number. After update the CFL number to its largest value, the partial fraction is computed by tool from \texttt{geometry.h} from 'upwinded' cell and stored in \para{cf}. The flux is therefore obtained as\\
   $\para{flux}=\para{uf.x[]}\times \para{cf}$
 }
 \begin{minted}{cpp}

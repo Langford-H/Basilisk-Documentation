@@ -5,7 +5,7 @@
 \chaptermeta[2.0][2025-06-08]
 
 \section{Introduction}\label{sec:heights-intro}
-`heights.h`, together with `parabola.h`, serves as a toolbox for `curvature.h` to compute surface curvature in multiphase flow. The aim of the file is to allocate a value representing the distance to the surface for every cell. This value is named `height`, hence the name of the header file. Before diving into details, several conceptual definitions are introduced with a 1D example.
+\texttt{heights.h}, together with \texttt{parabola.h}, serves as a toolbox for \texttt{curvature.h} to compute surface curvature in multiphase flow. The aim of the file is to allocate a value representing the distance to the surface for every cell. This value is named `height`, hence the name of the header file. Before diving into details, several conceptual definitions are introduced with a 1D example.
 
 \subsection{Surface}
 For each cell, if a `coherent surface' occurs within a certain distance, the cell is assigned a valid height value. Otherwise, an invalid data value `nodata' is allocated. A `coherent surface' is defined as a process where the color function (volume fraction in the VOF method) \para{c} changes from $0$ to $1$ or vice versa.

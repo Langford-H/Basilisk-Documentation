@@ -5,7 +5,7 @@
 \chaptermeta[draft][2025-06-09]
 
 \section{Introduction}
-This header file provides restriction, prolongation, and refinement operations under a tree grid for values used in \textbf{embed.h}. The content is divided into two parts: the refinement of cut-cell values, i.e., \para{cs} and \para{fs}, and the restriction/prolongation of values on cut-cells and cut-faces.
+This header file provides restriction, prolongation, and refinement operations under a tree grid for values used in \texttt{embed.h}. The content is divided into two parts: the refinement of cut-cell values, i.e., \para{cs} and \para{fs}, and the restriction/prolongation of values on cut-cells and cut-faces.
 
 \section{Refinement of Embed-Associated Values}
 \subsection{\func{embed\_fraction\_refine}}
@@ -29,7 +29,7 @@ The \func{embed\_fraction\_refine} function calculates the volume fraction conta
     \caption{Refinement of embed fraction \para{cs}. By switching the component of the normal direction $\mathbf{n}$, the program rotates the interface, thereby iterating the volume fraction of each subcell.}
     \label{fig:embed-tree-2Drefine}
 \end{figure}
-For cells containing an interface, given the function \func{rectangle\_fraction} from \textbf{geometry.h} and interface information $\mathbf{n}$, $\alpha$, the volume fraction inside each child cell can be obtained. As shown in figure \ref{fig:embed-tree-2Drefine1}, under a 2D condition, the area inside the child cell highlighted by a red dashed line is calculated.
+For cells containing an interface, given the function \func{rectangle\_fraction} from \texttt{geometry.h} and interface information $\mathbf{n}$, $\alpha$, the volume fraction inside each child cell can be obtained. As shown in figure \ref{fig:embed-tree-2Drefine1}, under a 2D condition, the area inside the child cell highlighted by a red dashed line is calculated.
 
 Instead of switching the computational domain (i.e., the red dashed cell), the program iterates between cells by switching the sign of the normal direction, as indicated in figure \ref{fig:embed-tree-2Drefine2}.
 
@@ -164,7 +164,7 @@ For boundary fine faces, a similar process is followed: first, identify the inte
 
 The fine face fractions for both inner and boundary faces are computed directly using 2D projections from a 3D interface.
 
-For the inner face, as shown in figure \ref{fig:embed-tree-3Dinner}, the fine face fraction is computed from a 2D projection in the red-contoured cell. Iteration among the four subcells is achieved by rotating the entire interface, as described in section (unfinished). Given $\mathbf{n} = (n_x, n_y, n_z)$ and $\alpha = \alpha_1$ for the example interface in figure \ref{fig:embed-tree-3Dinner1}, the face fraction on the inner fine face is obtained by calculating the volume fraction of the reconstructed interface shown in figure \ref{fig:embed-tree-3Dinner2}. Since volume calculations are supported by tools in \textbf{geometry.h}, the problem reduces to reconstructing the interface and determining its $\mathbf{n}$ and $\alpha$.
+For the inner face, as shown in figure \ref{fig:embed-tree-3Dinner}, the fine face fraction is computed from a 2D projection in the red-contoured cell. Iteration among the four subcells is achieved by rotating the entire interface, as described in section (unfinished). Given $\mathbf{n} = (n_x, n_y, n_z)$ and $\alpha = \alpha_1$ for the example interface in figure \ref{fig:embed-tree-3Dinner1}, the face fraction on the inner fine face is obtained by calculating the volume fraction of the reconstructed interface shown in figure \ref{fig:embed-tree-3Dinner2}. Since volume calculations are supported by tools in \texttt{geometry.h}, the problem reduces to reconstructing the interface and determining its $\mathbf{n}$ and $\alpha$.
 
 The reconstructed interface is perpendicular to the projection plane and intersects the same line as the original interface on the projection plane, with $\mathbf{n} = (0, n_y, n_z)$ and $\alpha = \alpha_1$.
 

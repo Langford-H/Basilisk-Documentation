@@ -5,7 +5,7 @@
 \chaptermeta[1.0][2025-06-07]
 
 \section{Introduction and Background}\label{sec:poisson-intro}
-\textbf{poisson.h} serves as toolbox which provides functions to construct V-cycle iteration solver for implicit equations. A specific one for solving poisson equation is constructed within the headfile as an example. We shall first introduce the constructing toolbox.\par
+\texttt{poisson.h} serves as toolbox which provides functions to construct V-cycle iteration solver for implicit equations. A specific one for solving poisson equation is constructed within the headfile as an example. We shall first introduce the constructing toolbox.\par
 Assuming the governing equation can be written as
 \begin{equation}
   f( x) = y
@@ -52,11 +52,11 @@ Loop will break out either residual satisfies tolerance constraint or number of 
 \begin{equation}\label{equ:poisson-indirect}
   \delta x^{k+1}_i = F(\delta x^k_1,\delta x^k_2,\cdots,\delta x^k_{i-1},\delta x^k_{i+1},\cdots,\delta x_n^k, RES^k)
 \end{equation}
-Back to \func{mg\_solve}, readers may notice from figure \ref{fig:poisson-workflow} that all the function within, including \func{mg\_solve} itself, are divided into three layer by dashed line and each layer is named by Roman number from top to bottom. Higher the layer, more irreplaceable the function is. Therefore, functions at \Romannum{3} can be changed or altered based on one's purpose. In another word, users can choose their own \func{relax} and \func{residual} based on equation they cope with. The governing equation for \textbf{poisson.h} is
+Back to \func{mg\_solve}, readers may notice from figure \ref{fig:poisson-workflow} that all the function within, including \func{mg\_solve} itself, are divided into three layer by dashed line and each layer is named by Roman number from top to bottom. Higher the layer, more irreplaceable the function is. Therefore, functions at \Romannum{3} can be changed or altered based on one's purpose. In another word, users can choose their own \func{relax} and \func{residual} based on equation they cope with. The governing equation for \texttt{poisson.h} is
 \begin{equation}\label{equ:poisson-poisson}
   L(a)=\nabla\cdot(\alpha\nabla a) + \lambda a =b
 \end{equation}
-where $L$ is a linear operator. Based on above discussion such equation can be solved by multigrid solver only if one constructs appropriate \func{relax} and \func{residual} function. Another example is referred to headfile \textbf{viscosity.h} where same solver construction is used for totally different linear equation. 
+where $L$ is a linear operator. Based on above discussion such equation can be solved by multigrid solver only if one constructs appropriate \func{relax} and \func{residual} function. Another example is referred to headfile \texttt{viscosity.h} where same solver construction is used for totally different linear equation. 
 
 \begin{figure}[H]
     \centering

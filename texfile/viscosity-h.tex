@@ -5,7 +5,7 @@
 \chaptermeta[1.0][2025-06-07]
 
 \section{Introduction and Background}
-\textbf{viscosity.h} is constructed exclusively for NS solver 'centered.h' (see corresponding doc for more information.), whose purpose is to solve viscos equation implicitly using poisson equation solver built in 'poisson.h'. The governing equation is 
+\texttt{viscosity.h} is constructed exclusively for NS solver 'centered.h' (see corresponding doc for more information.), whose purpose is to solve viscos equation implicitly using poisson equation solver built in 'poisson.h'. The governing equation is 
 \begin{equation}\label{equ:viscosity-desired}
   \rho_{n+ \frac{1}{2}}[ \frac{ \mathbf{u}^*- \mathbf{u}'}{\Delta t}] = \nabla\cdot [2\mu_{n+ \frac{1}{2}} \mathbf{D}^*]
 \end{equation}
