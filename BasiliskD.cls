@@ -83,7 +83,7 @@
   mathescape=true,
   breaklines=true,
   bgcolor=codebg,
-  linenos=true
+  linenos=false
 }
 
 % TikZ styles for code visualization
@@ -107,6 +107,13 @@
     \node [block] {#1};
   \end{tikzpicture}
 }
+
+% Command for code env
+\newenvironment{code}
+  {\VerbatimEnvironment\begin{minted}{cpp}}
+  {
+\end{minted}
+  }
 
 % Command for downward arrow in code flow
 \newcommand{\codearrow}{%
