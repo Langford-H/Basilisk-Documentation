@@ -141,7 +141,30 @@ Finally, the velocity is updated:
     \mathbf{u}^{n+1} = \mathbf{u}^{***} + \Delta t \mathbf{g}^{n+1}
 \end{equation}  
 
+\subsection{Notes on the Projection Method and VOF-NS Equations}
 \subsubsection{Approximate vs. Exact Projection}  
 The approximate projection method, as initially described, pertains to an algorithm where the discrete Laplace operator does not precisely equal the discrete divergence of the discrete gradient, according to Almgren (2000)\cite{2000_Almgren}. This situation arises exclusively on grids where only the cell-center is active, due to the misalignment caused by the face-centered vector. However, \texttt{Basilisk} circumvents this issue. Nonetheless, as previously discussed, while the face-centered velocity \para{$u_f$} maintains strict non-divergence, the cell-centered velocity \para{$u_c$} does not, as it is derived by subtracting the average of the updated pressure-acceleration at the face center. Consequently, this is why the projection method utilized by \texttt{Basilisk} is termed an approximate projection.
+
+\subsubsection{The Non-conserving Form of the VOF-NS Equations}
+When applying the VOF method, equation \ref{equ:centered-nseq1} cannot be directly obtained, since the density is no longer a constant but a time-dependent function, given by
+\begin{equation}
+    \rho(\mathbf{x}, t) = \rho_1 c^n + \rho_2 (1 - c^n).
+\end{equation}
+Consequently, the incompressible Navier--Stokes equations take the form
+\begin{gather}
+    \frac{\partial (\rho \mathbf{u})}{\partial t} 
+    + \nabla \cdot (\rho \mathbf{u} \otimes \mathbf{u}) 
+    = -\nabla p + \nabla \cdot (2 \mu \mathbf{D}) 
+    + \mathbf{a}, \label{equ:centered-incnseq1} \\
+    \frac{\partial \rho}{\partial t} + \nabla \cdot (\rho \mathbf{u}) = 0, \label{equ:centered-incnseq2} \\
+    \nabla \cdot \mathbf{u} = 0. \label{equ:centered-incnseq3}
+\end{gather}
+Here, the mass continuity equation \ref{equ:centered-incnseq2} and the incompressibility constraint \ref{equ:centered-incnseq3} are decoupled for the same reason.  
+By substituting the incompressibility condition back into the continuity equation, we obtain
+\begin{equation}
+    \frac{\partial \rho}{\partial t} + \mathbf{u} \cdot \nabla \rho = 0. \label{equ:centered-incnseq4}
+\end{equation}
+Combining equation \ref{equ:centered-incnseq4} with the momentum equation \ref{equ:centered-incnseq1}, we finally recover the Navier--Stokes equations in the form of equation \ref{equ:centered-nseq1}.  
+This formulation allows us to avoid explicitly handling the highly discontinuous advection terms that arise under large density ratios, such as in the case of an air--water interface ($\rho_\text{water} : \rho_\text{air} \sim 1000:1$).
 
 \printbibliography
