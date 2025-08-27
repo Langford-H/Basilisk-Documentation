@@ -1,46 +1,49 @@
 \relax 
 \providecommand\hyper@newdestlabel[2]{}
-\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{i}{section.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {2}2D scenario}{i}{section.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Linear Representation of the Interface}{i}{subsection.2.1}\protected@file@percent }
-\newlabel{equ:myc-original}{{1}{i}{Linear Representation of the Interface}{equation.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Linear representation of the interface, with normal direction $\mathbf  {n} = (n_x, n_y)$.}}{ii}{figure.caption.1}\protected@file@percent }
-\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{fig:myc-2Dlinear}{{1}{ii}{Linear representation of the interface, with normal direction $\mathbf {n} = (n_x, n_y)$}{figure.caption.1}{}}
-\newlabel{equ:myc-centered}{{2}{ii}{Linear Representation of the Interface}{equation.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Centered columns scheme}{ii}{subsection.2.2}\protected@file@percent }
-\newlabel{sec:myc-centered}{{2.2}{ii}{Centered columns scheme}{subsection.2.2}{}}
-\newlabel{fig:myc-centered-a}{{2a}{iii}{\relax }{figure.caption.2}{}}
-\newlabel{sub@fig:myc-centered-a}{{a}{iii}{\relax }{figure.caption.2}{}}
-\newlabel{fig:myc-centered-b}{{2b}{iii}{\relax }{figure.caption.2}{}}
-\newlabel{sub@fig:myc-centered-b}{{b}{iii}{\relax }{figure.caption.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Sketch of the computation process for the centered scheme. The red cell highlights the current cell where the interfacial slope is being computed. The blue lines represent the summation of volume fractions across columns, and the black solid line shows the resulting slope obtained by the centered scheme. In figure (a), the scheme accurately captures the interface when it spans across opposite boundaries. By contrast, figure (b) presents the same scenario but from a complementary perspective. The result reveals a significant discrepancy between the computed and actual slopes. Note that the dashed and solid lines are intentionally reversed to facilitate comparison with the true slope of the interface.}}{iii}{figure.caption.2}\protected@file@percent }
-\newlabel{fig:myc-centered}{{2}{iii}{Sketch of the computation process for the centered scheme. The red cell highlights the current cell where the interfacial slope is being computed. The blue lines represent the summation of volume fractions across columns, and the black solid line shows the resulting slope obtained by the centered scheme. In figure (a), the scheme accurately captures the interface when it spans across opposite boundaries. By contrast, figure (b) presents the same scenario but from a complementary perspective. The result reveals a significant discrepancy between the computed and actual slopes. Note that the dashed and solid lines are intentionally reversed to facilitate comparison with the true slope of the interface}{figure.caption.2}{}}
-\newlabel{equ:myc-dcentered}{{4}{iii}{Centered columns scheme}{equation.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Young's Scheme}{iv}{subsection.2.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Illustration of Young's scheme. The interface normal is obtained by averaging the normals at four cell corners, indicated by empty circles. Blue shading marks the cells involved in the final algebraic expression, with dark blue showing overlaps.}}{iv}{figure.caption.3}\protected@file@percent }
-\newlabel{fig:myc-young}{{3}{iv}{Illustration of Young's scheme. The interface normal is obtained by averaging the normals at four cell corners, indicated by empty circles. Blue shading marks the cells involved in the final algebraic expression, with dark blue showing overlaps}{figure.caption.3}{}}
-\newlabel{equ:myc-youngs}{{8}{iv}{Young's Scheme}{equation.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Mixed Young's and Centered scheme}{v}{subsection.2.4}\protected@file@percent }
-\newlabel{sec:myc-myc}{{2.4}{v}{Mixed Young's and Centered scheme}{subsection.2.4}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces An example illustrating the difference between the two schemes. The red cell denotes the target interfacial cell, with the interface having a slope of $3/4$. For simplicity, the cut-cell areas are labeled locally within each intersected cell.}}{v}{figure.caption.4}\protected@file@percent }
-\newlabel{fig:myc-MYC}{{4}{v}{An example illustrating the difference between the two schemes. The red cell denotes the target interfacial cell, with the interface having a slope of $3/4$. For simplicity, the cut-cell areas are labeled locally within each intersected cell}{figure.caption.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}\textbf  {\textcolor {function}{myc}} (2D version)}{v}{subsection.2.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.5.1}Parameters}{v}{subsubsection.2.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.5.2}Program Workflow}{v}{subsubsection.2.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {8}myc2d.h,myc.h Documentation}{48}{chapter.8}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\newlabel{refsection:8}{{8}{48}{myc2d.h,myc.h Documentation}{chapter.8}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {8.1}Introduction}{48}{section.8.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {8.2}2D scenario}{48}{section.8.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2.1}Linear Representation of the Interface}{48}{subsection.8.2.1}\protected@file@percent }
+\newlabel{equ:myc-original}{{8.1}{48}{Linear Representation of the Interface}{equation.8.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8.1}{\ignorespaces Linear representation of the interface, with normal direction $\mathbf  {n} = (n_x, n_y)$.}}{49}{figure.caption.75}\protected@file@percent }
+\newlabel{fig:myc-2Dlinear}{{8.1}{49}{Linear representation of the interface, with normal direction $\mathbf {n} = (n_x, n_y)$}{figure.caption.75}{}}
+\newlabel{equ:myc-centered}{{8.2}{49}{Linear Representation of the Interface}{equation.8.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2.2}Centered columns scheme}{49}{subsection.8.2.2}\protected@file@percent }
+\newlabel{sec:myc-centered}{{8.2.2}{49}{Centered columns scheme}{subsection.8.2.2}{}}
+\newlabel{fig:myc-centered-a}{{8.2a}{50}{\relax }{figure.caption.76}{}}
+\newlabel{sub@fig:myc-centered-a}{{a}{50}{\relax }{figure.caption.76}{}}
+\newlabel{fig:myc-centered-b}{{8.2b}{50}{\relax }{figure.caption.76}{}}
+\newlabel{sub@fig:myc-centered-b}{{b}{50}{\relax }{figure.caption.76}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8.2}{\ignorespaces Sketch of the computation process for the centered scheme. The red cell highlights the current cell where the interfacial slope is being computed. The blue lines represent the summation of volume fractions across columns, and the black solid line shows the resulting slope obtained by the centered scheme. In figure (a), the scheme accurately captures the interface when it spans across opposite boundaries. By contrast, figure (b) presents the same scenario but from a complementary perspective. The result reveals a significant discrepancy between the computed and actual slopes. Note that the dashed and solid lines are intentionally reversed to facilitate comparison with the true slope of the interface.}}{50}{figure.caption.76}\protected@file@percent }
+\newlabel{fig:myc-centered}{{8.2}{50}{Sketch of the computation process for the centered scheme. The red cell highlights the current cell where the interfacial slope is being computed. The blue lines represent the summation of volume fractions across columns, and the black solid line shows the resulting slope obtained by the centered scheme. In figure (a), the scheme accurately captures the interface when it spans across opposite boundaries. By contrast, figure (b) presents the same scenario but from a complementary perspective. The result reveals a significant discrepancy between the computed and actual slopes. Note that the dashed and solid lines are intentionally reversed to facilitate comparison with the true slope of the interface}{figure.caption.76}{}}
+\newlabel{equ:myc-dcentered}{{8.4}{50}{Centered columns scheme}{equation.8.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2.3}Young's Scheme}{51}{subsection.8.2.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {8.3}{\ignorespaces Illustration of Young's scheme. The interface normal is obtained by averaging the normals at four cell corners, indicated by empty circles. Blue shading marks the cells involved in the final algebraic expression, with dark blue showing overlaps.}}{51}{figure.caption.77}\protected@file@percent }
+\newlabel{fig:myc-young}{{8.3}{51}{Illustration of Young's scheme. The interface normal is obtained by averaging the normals at four cell corners, indicated by empty circles. Blue shading marks the cells involved in the final algebraic expression, with dark blue showing overlaps}{figure.caption.77}{}}
+\newlabel{equ:myc-youngs}{{8.8}{51}{Young's Scheme}{equation.8.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2.4}Mixed Young's and Centered scheme}{52}{subsection.8.2.4}\protected@file@percent }
+\newlabel{sec:myc-myc}{{8.2.4}{52}{Mixed Young's and Centered scheme}{subsection.8.2.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8.4}{\ignorespaces An example illustrating the difference between the two schemes. The red cell denotes the target interfacial cell, with the interface having a slope of $3/4$. For simplicity, the cut-cell areas are labeled locally within each intersected cell.}}{52}{figure.caption.78}\protected@file@percent }
+\newlabel{fig:myc-MYC}{{8.4}{52}{An example illustrating the difference between the two schemes. The red cell denotes the target interfacial cell, with the interface having a slope of $3/4$. For simplicity, the cut-cell areas are labeled locally within each intersected cell}{figure.caption.78}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2.5}\textbf  {\textcolor {function}{myc}} (2D version)}{52}{subsection.8.2.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Parameters}{52}{subsubsection*.79}\protected@file@percent }
 \@setckpt{texfile/myc-h-and-myc2d-h}{
-\setcounter{page}{9}
+\setcounter{page}{54}
 \setcounter{equation}{8}
 \setcounter{enumi}{2}
 \setcounter{enumii}{0}
 \setcounter{enumiii}{0}
 \setcounter{enumiv}{0}
 \setcounter{footnote}{0}
-\setcounter{mpfootnote}{0}
+\setcounter{mpfootnote}{1}
 \setcounter{part}{0}
+\setcounter{chapter}{8}
 \setcounter{section}{2}
 \setcounter{subsection}{5}
-\setcounter{subsubsection}{2}
+\setcounter{subsubsection}{0}
 \setcounter{paragraph}{0}
 \setcounter{subparagraph}{0}
 \setcounter{figure}{4}
@@ -48,14 +51,14 @@
 \setcounter{parentequation}{0}
 \setcounter{FancyVerbLine}{5}
 \setcounter{linenumber}{1}
-\setcounter{LN@truepage}{8}
+\setcounter{LN@truepage}{53}
 \setcounter{FancyVerbWriteLine}{0}
 \setcounter{FancyVerbBufferLine}{21}
 \setcounter{FV@TrueTabGroupLevel}{0}
 \setcounter{FV@TrueTabCounter}{0}
 \setcounter{FV@HighlightLinesStart}{0}
 \setcounter{FV@HighlightLinesStop}{0}
-\setcounter{FancyVerbLineBreakLast}{0}
+\setcounter{FancyVerbLineBreakLast}{2}
 \setcounter{FV@BreakBufferDepth}{0}
 \setcounter{float@type}{8}
 \setcounter{minted@FancyVerbLineTemp}{0}
@@ -65,9 +68,9 @@
 \setcounter{subfigure}{0}
 \setcounter{subtable}{0}
 \setcounter{section@level}{0}
-\setcounter{Item}{2}
-\setcounter{Hfootnote}{0}
-\setcounter{bookmark@seq@number}{9}
+\setcounter{Item}{13}
+\setcounter{Hfootnote}{1}
+\setcounter{bookmark@seq@number}{62}
 \setcounter{tabx@nest}{0}
 \setcounter{listtotal}{0}
 \setcounter{listcount}{0}
@@ -77,7 +80,7 @@
 \setcounter{citetotal}{0}
 \setcounter{multicitecount}{0}
 \setcounter{multicitetotal}{0}
-\setcounter{instcount}{4}
+\setcounter{instcount}{41}
 \setcounter{maxnames}{3}
 \setcounter{minnames}{1}
 \setcounter{maxitems}{3}
@@ -87,11 +90,11 @@
 \setcounter{savedcitecounter}{0}
 \setcounter{uniquelist}{0}
 \setcounter{uniquename}{0}
-\setcounter{refsection}{0}
+\setcounter{refsection}{8}
 \setcounter{refsegment}{0}
 \setcounter{maxextratitle}{0}
 \setcounter{maxextratitleyear}{0}
-\setcounter{maxextraname}{0}
+\setcounter{maxextraname}{2}
 \setcounter{maxextradate}{0}
 \setcounter{maxextraalpha}{0}
 \setcounter{abbrvpenalty}{50}
@@ -99,7 +102,7 @@
 \setcounter{lownamepenalty}{25}
 \setcounter{maxparens}{3}
 \setcounter{parenlevel}{0}
-\setcounter{blx@maxsection}{0}
+\setcounter{blx@maxsection}{8}
 \setcounter{mincomprange}{10}
 \setcounter{maxcomprange}{100000}
 \setcounter{mincompwidth}{1}

@@ -1,3 +1,6 @@
+# This is a script to update single pdf file, you can use it by py ./rebuild.py --flag
+# flag=changed: only regenerate those with different timestamps;
+# flag=all: regenerate all.
 import subprocess
 import time
 import argparse
