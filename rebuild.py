@@ -1,17 +1,19 @@
-# This is a script to update single pdf file, you can use it by py ./rebuild.py --flag
-# flag=changed: only regenerate those with different timestamps;
-# flag=all: regenerate all.
+# rebuild.py
 import subprocess
 import time
 import argparse
+import shutil
 from pathlib import Path
 
 # === CONFIG ===
 SRC_DIR = Path("texfile")        # folder with your .tex contents
 OUT_DIR = Path("pdfoutput")
 MASTER = Path("singlepdftest.tex")   # temporary build file
-CLASS_FILE = Path("BasiliskD.cls") # class file dependency
-CLASS_NAME = "BasiliskD"           # your class name (without .cls)
+CLASS_FILE = Path("BasiliskD.cls")   # class file dependency
+CLASS_NAME = "BasiliskD"             # your class name (without .cls)
+DOC_MAIN = Path("Basilisk-Doc.tex")  # full document entry point
+DOC_PDF = Path("Basilisk-Doc.pdf")   # output name
+
 CLEAN_EXTS = [".aux", ".log", ".out", ".bbl", ".blg", ".bcf", ".run.xml"]
 
 OUT_DIR.mkdir(exist_ok=True)
@@ -30,7 +32,7 @@ def run(cmd):
 
 def compile_for(texfile: Path):
     name = texfile.stem
-    relpath = texfile.with_suffix("")  # remove .tex, keep folder/name
+    relpath = texfile.with_suffix("")  # remove .tex
     print(f"🔨 Compiling {name}...")
 
     # generate singlepdf.tex wrapper
@@ -56,11 +58,37 @@ def compile_for(texfile: Path):
     else:
         print(f"❌ Failed for {name}")
 
-    # clean aux/log
+    cleanup_aux()
+
+def compile_main_doc():
+    """Compile the coherent Basilisk-Doc.tex"""
+    print("📚 Compiling Basilisk-Doc (full documentation)...")
+    run(["pdflatex", "-interaction=nonstopmode", "-halt-on-error", str(DOC_MAIN)])
+    run(["biber", DOC_MAIN.stem])
+    run(["pdflatex", "-interaction=nonstopmode", "-halt-on-error", str(DOC_MAIN)])
+    run(["pdflatex", "-interaction=nonstopmode", "-halt-on-error", str(DOC_MAIN)])
+
+    if DOC_PDF.exists():
+        print(f"✅ Created {DOC_PDF}")
+    else:
+        print("❌ Failed to build Basilisk-Doc")
+
+    cleanup_aux()
+
+def cleanup_aux():
+    """Remove auxiliary files and minted dirs"""
     for ext in CLEAN_EXTS:
         f = MASTER.with_suffix(ext)
         if f.exists():
             f.unlink()
+        f2 = DOC_MAIN.with_suffix(ext)
+        if f2.exists():
+            f2.unlink()
+
+    # Remove minted dirs
+    for minted_dir in Path(".").glob("_minted*"):
+        if minted_dir.is_dir():
+            shutil.rmtree(minted_dir, ignore_errors=True)
 
 def need_recompile(texfile: Path):
     """Check if file or class is newer than last build"""
@@ -81,7 +109,6 @@ if __name__ == "__main__":
     texfiles = list(SRC_DIR.glob("*.tex"))
     if not texfiles:
         print("⚠️ No .tex files found in", SRC_DIR)
-        exit(1)
 
     if args.all:
         for texfile in texfiles:
@@ -95,7 +122,10 @@ if __name__ == "__main__":
     else:
         print("⚠️ Please specify either --all or --changed")
 
-    # save updated timestamps
+    # Always build the coherent doc
+    compile_main_doc()
+
+    # Save updated timestamps
     with open(timestamp_file, "w") as f:
         for k, v in timestamps.items():
             f.write(f"{k}::{v}\n")

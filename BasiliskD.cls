@@ -183,7 +183,6 @@
 % Formatting and Styling
 % -------------------
 % Table of contents depth
-
 % Chapter/section title format
 \ifsingle
   \setcounter{secnumdepth}{3}  % Number up to subsubsection
