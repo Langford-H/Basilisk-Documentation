@@ -1,0 +1,50 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage[active,tightpage]{preview}
+\usetikzlibrary{arrows.meta}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{0.125pt}
+
+\definecolor{dilation}{rgb}{0.54, 0.81, 0.94}
+
+\begin{document}
+\begin{tikzpicture}
+    \begin{scope}
+        % Shade the triangular region C
+        \fill[gray!50] (0,1.5) -- (0,0) -- (1.5,0) -- cycle;
+
+        % Draw the square
+        \draw[thick] (0,0) rectangle (2,2);
+
+        % Draw the normal vector n
+        \draw[->, thick] (0.75,0.75) -- (1,1) node [anchor=west] {$\mathbf{n}$};
+
+        % Add labels
+        \node[anchor=south east] at (0,2) {$\phi[0,1]$};
+        \node[anchor=north west] at (2,0) {$\phi[1,0]$};
+        \node[anchor=north east] at (0,0) {$\phi[]$};
+        \node[anchor = east] at (-0.3,1) {$s.x[]$}; % Adjusted slightly left for alignment
+        \node at (1,-0.3) {$s.y[]$}; % Adjusted slightly below for alignment
+        \node[anchor=north east] at (0.7,0.7) {$C$};
+            
+    \end{scope}
+
+    \begin{scope}[xshift=4cm]
+        % Shade the triangular region C
+        \fill[gray!50] (0,1.5) -- (0,0) -- (1.5,0) -- cycle;
+
+        % Draw the square
+        \draw[thick] (0,0) rectangle (2,2);
+
+        % Draw the axes
+        \draw[thick,->] (-0.25,1) -- (2.5,1) node[anchor=north] {$X$};
+        \draw[thick,->] (1,-0.25) -- (1,2.5) node[anchor=west] {$Y$};
+
+        % labels
+        \node[anchor=east] at (0,1.5) {$A$};
+        \node[anchor=north] at (1.5,0) {$B$};
+    \end{scope}
+
+\end{tikzpicture}
+
+\end{document}

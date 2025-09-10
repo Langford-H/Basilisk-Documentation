@@ -39,7 +39,7 @@ Based on our previous discussions, coherent documentation for Basilisk should in
 	- [] two-phase.h
 		- [] two-phase-generic.h
 		- [x] [vof.h](./pdfoutput/vof-h.pdf)
-			- [] fractions.h
+			- [] [fractions.h](./pdfoutput/fractions-h.pdf)
 			- [] geometry.h
 			- [] [myc.h & myc2d.h](./pdfoutput/myc-h-and-myc2d-h.pdf)
 	- [] iforce.h
@@ -71,6 +71,7 @@ Based on our previous discussions, coherent documentation for Basilisk should in
 ## Compiler
 - [] ast
 
+# Others
 ## Introduction to the `.cls` File
 
 A custom `.cls` file has been created as a template for this documentation. To use it, simply declare `\documentclass{BasiliskD}` in your LaTeX source. The class supports three customizable options:
@@ -83,6 +84,18 @@ With these settings, users can choose to read a concise algorithm-focused versio
 
 If you'd like to create your own documentation, you can start from this [LaTeX example](./texfile/codeexample.tex) and compile it using the sequence: `PDFLaTeX → Biber → PDFLaTeX → PDFLaTeX`.
 
+## Autobuild Script
+
+The autobuild script is written in Python and can be executed using the following command:
+
+```bash
+py rebuild.py --flag
+```
+
+### Flag Descriptions
+
+- **`all`**: Regenerates all single files and saves them to the `./pdfoutput` directory, then regenerates the Basilisk-Doc.
+- **`changed`**: Regenerates only the modified files and updates the Basilisk-Doc.
 
 # Contact
 [My sandbox](http://basilisk.fr/sandbox/HCH/README) and feel free to email me: dahuanghhc@gmail.com

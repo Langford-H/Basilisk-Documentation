@@ -1,18 +1,10 @@
-%%%%%% FORMAT %%%%%%
-% \texttt{name-of-headerfiles}
-% \para{parameters-in-program}
-% \func{name-of-function}
-\documentclass[
-    % single, % To generate separate documentation
-    hidecode, % To hide program workflow
-    bibpath=./reference.bib]{BasiliskD}
-
+\documentclass[hidecode,bibpath=./reference.bib]{BasiliskD}
 \begin{document}
-\pagenumbering{roman} % Roman for front matter
-
+\pagenumbering{roman}
 \tableofcontents
 \clearpage
 \pagenumbering{arabic}
+% BEGIN AUTO-INCLUDES
 
 \include{texfile/centered-h}
 \include{texfile/double-projection-h}
@@ -21,6 +13,8 @@
 \include{texfile/viscosity-h}
 \include{texfile/vof-h}
 \include{texfile/heights-h}
+\include{texfile/fractions-h}
 \include{texfile/myc-h-and-myc2d-h}
 \include{texfile/embed-tree-h}
+% END AUTO-INCLUDES
 \end{document}

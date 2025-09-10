@@ -14,7 +14,7 @@ CLASS_NAME = "BasiliskD"             # your class name (without .cls)
 DOC_MAIN = Path("Basilisk-Doc.tex")  # full document entry point
 DOC_PDF = Path("Basilisk-Doc.pdf")   # output name
 
-CLEAN_EXTS = [".aux", ".log", ".out", ".bbl", ".blg", ".bcf", ".run.xml"]
+CLEAN_EXTS = [".aux", ".log", ".out", ".bbl", ".blg", ".bcf", ".run.xml", ".toc"]
 
 OUT_DIR.mkdir(exist_ok=True)
 
