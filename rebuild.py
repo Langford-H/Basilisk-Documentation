@@ -38,6 +38,7 @@ def compile_for(texfile: Path):
     # generate singlepdf.tex wrapper
     content = f"""\\documentclass[single,bibpath=./reference.bib]{{{CLASS_NAME}}}
 \\begin{{document}}
+\\pagenumbering{{arabic}}
 \\include{{{relpath.as_posix()}}}
 \\end{{document}}
 """

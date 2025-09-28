@@ -1,4 +1,7 @@
 \chapter{fractions.h Documentation}
+\ifsingle
+\maketitle
+\fi
 \chaptermeta[draft][2025-09-10]
 \section{Introduction}\label{sec:intro}
 \texttt{fractions.h} provides a toolbox for reconstructing interfaces from the
@@ -16,15 +19,15 @@ volume fraction field. Its two main purposes are:
 
 In addition, the header includes auxiliary functions to support coarsening and refinement of volume fractions across grid levels, visualization of the interface, and computation of the total interface area.
 
-\section{Assigning Volume Fractions from Level-Set Fields}\label{sec:fractions-init}  
+\subsection{Assigning Volume Fractions from Level-Set Fields}\label{sec:fractions-init}  
 
-Level-set function $\Phi$ represents the distance to the interface and are stored discretely at vertices of the gird. Take $\Phi$ as input the function \func{fractions} computes the volume fraction field and face fraction (if required).Space where $\Phi>0$ is deemed as inside the interface, the volume fraction is set to $1.0$ and vice versa.
+Level-set function $\Phi$ represents the distance to the interface and are stored discretely at vertices of the gird. Take $\Phi$ as input the function \func{fractions} computes the volume fraction field and face fraction (if required). Space where $\Phi>0$ is deemed as inside the interface, the volume fraction is set to $1.0$ and vice versa.
 
 In header file \texttt{geometry.h} a group of tools have been constructed to obtain volume fractions of single cell given the interface normal $\mathbf{n}$ and the intersection $\alpha$ both in 2D and 3D cases. The overall process to compute volume fraction is therefore twofolds: 1)to obtain $(\mathbf{n}, \alpha)$ 2)pass the parameter to corresponding tools provided by \texttt{geometry.h}. The underlying theory shall be briefly introduced in the following.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[height=4cm]{./image/fractions-h/normal.pdf}
+  \includegraphics[height=5cm]{./image/fractions-h/normal.pdf}
   \caption{A sketch for level-set based volume fraction initialization. The left panel shows the normal vector $\mathbf{n}$, face fraction $s$ and the vertex level-set value. The right panel illustrates the coordinate system, two intersection point is marked as $A,B$.}
   \label{fig:fractions-normal}
 \end{figure}
@@ -51,3 +54,23 @@ To summarize, the algorithm to compute volume fractions from level-set fields is
   \item Compute volume (face) fraction from $\mathbf{n}$ and $\alpha$ using tools provided by \texttt{geometry.h} (2D cases ends here).
   \item For 3D cases, compute interfacial normal using face fractions in all three directions, then compute $\alpha$ from $\mathbf{n}$ and edge fractions, finally compute volume fraction using tools provided by \texttt{geometry.h}.
 \end{enumerate}
+
+\section{Functions}
+
+\subsection{Refinement Functions}
+
+Functions \func{fraction\_refine} and \func{alpha\_refine} are used to refine the volume fraction field and the intersection field $\alpha$, respectively, when tree grids are employed and a cell is subdivided.
+
+Starting from the parent interfacial cell, the volume fraction $c$, the interface normal $\mathbf{n}$, and the intersection value $\alpha$ are computed sequentially using tools provided in \texttt{myc.h} and \texttt{geometry.h}. The volume fractions of the child cells are then obtained using the function \func{rectangle\_fraction} (see the \texttt{geometry.h} documentation for details). For instance, when provided with the sub-rectangle $(0,0,0)$--$(0.5,0.5,0.5)$, the function returns the volume fraction contained within this region. By specifying the indices of child cells (e.g., $child.i = \pm 1$), the function iterates through all sub-cells by rotating the interfacial normal, i.e. by multiplying $\mathbf{n}$ with the child indices.
+
+The refinement of $\alpha$ for child cells can be understood as a coordinate transformation. Specifically, the origin is shifted to the center of the child cell and the unit length is scaled by a factor of $1/2$. Starting from the parent cell representation
+\begin{equation}
+  n_x X + n_y Y + n_z Z = \alpha,
+\end{equation}
+the transformed equation for the child cell, using the coordinate transformation
+$X' = 2\bigl(X - \tfrac{1}{2} child.x\bigr)$, becomes
+\begin{equation}
+  n_x X' + n_y Y' + n_z Z' =
+  2\alpha - \tfrac{n_x child.x}{2} - \tfrac{n_y child.y}{2}
+        - \tfrac{n_z child.z}{2} = \alpha'
+\end{equation}
