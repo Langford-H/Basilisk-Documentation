@@ -5,7 +5,7 @@
 \chaptermeta[1.0][2025-01-01]
 
 \section{Introduction}
-This solver addresses the incompressible Navier-Stokes equations\cite{2003_Popinet,2015_Popinet}:
+This solver addresses the incompressible Navier-Stokes equations\cite{2003_Popinet,2015_Popinet} on collocated grids i.e. velocity $\mathbf{u}$ as well as pressure $p$ are stored at center of the cell:
 
 \begin{gather}
     \frac{\partial \mathbf{u}}{\partial t} 
@@ -54,7 +54,7 @@ To summarize, solving the Navier-Stokes equations involves four main steps: \tex
     - \frac{\nabla p^n}{\rho^{n-1/2}} \right)\label{equ:centered-diffalter}
 \end{gather}
 
-Once $\mathbf{u}^{***}$ is computed, we obtain $\mathbf{u}^{n+1}$ by:
+Once $\mathbf{u}^{***}$ is computed, we obtain $\mathbf{u}^{n+1}$ with:
 
 \begin{equation}
     \mathbf{u}^{n+1} = \mathbf{u}^{***} 
@@ -62,13 +62,13 @@ Once $\mathbf{u}^{***}$ is computed, we obtain $\mathbf{u}^{n+1}$ by:
     - \frac{\nabla p^{n+1}}{\rho^{n+1/2}} \right)
 \end{equation}
 
-Using the incompressibility constraint:
+The pressure gradient $\nabla p^{n+1}$ in the previous equation is obtained by applying the incompressibility constraint:
 
 \begin{gather}
     \nabla \cdot \mathbf{u}^{n+1} = 0
 \end{gather}
 
-the pressure gradient $\nabla p^{n+1}$ can be computed by solving a Poisson equation in the \textbf{Projection} step.
+to solve a Poisson equation in the \textbf{Projection} step.
 
 \subsubsection{Property Update}
 Equation \ref{equ:centered-colorfunc} is the discrete form of advection equation for markers
@@ -78,14 +78,16 @@ Equation \ref{equ:centered-colorfunc} is the discrete form of advection equation
 the scheme of advection term $\mathbf{F}(c,\mathbf{u}_f^n)$ varies depending on the practical condition, the $\mathbf{u}_f^n$ here is the strict non-divergence face velocity obtained in the last final step (see section \ref{sec:centered-celltoface}). If $c$ denotes the volume of fluids and the header file \texttt{two-phase.h} is included, the geometric advection scheme in \texttt{vof.h} is activated. Otherwise, if $c$ represents tracers, the BCG scheme is applied to solve the equation. For further details, refer to the \texttt{tracers.h} and \texttt{vof.h} documentation.
 
 The density $\rho$ and viscosity $\mu_f$ at the $n+1/2$ time step are determined based on the distribution of $c$, this step is implemented in \texttt{two-phase-generic.h}. For those condition with large density ratio, there is option to smear the $\alpha_f=1/\rho$ in the same header file, as it is considered in poisson equation solver. All these steps are achieved by event succession, note although the body force such as surface tension is associated with distribution of $c$, it is actually implemented in the \textbf{Projection} step also through succession of event `acceleration'.
-\subsection{Advection}
+\subsection{Advection}\label{sec:centered-advection}
 
 In this step, we merge the first two terms on the L.H.S. of Equation \ref{equ:centered-advdiff}, solving:  
 \begin{equation}
     \rho^{n+1/2}\left[\frac{\mathbf{u}^* - \mathbf{u}^n}{\Delta t} + \nabla\cdot(\mathbf{u}\otimes\mathbf{u})^{n+1/2}\right] = 0\label{equ:centered-adv}
 \end{equation}  
-where $\mathbf{u}^*$ is the intermediate velocity. Given the face velocity $\mathbf{u}^{n+1/2}_f$, this equation is solved using functions provided by the header file \texttt{bcg.h}, following the BCG scheme.  For further details on the BCG scheme, please refer to the \texttt{bcg.h} documentation.\\
-The face velocity $\mathbf{u}^{n+1/2}_f$ is first computed using the BCG scheme and then projected to satisfy the non-divergence constraint, as required by the functions provided in \texttt{bcg.h}. Since these functions do not directly output values at $n+1/2$, this computation is performed separately in \texttt{centered.h}.\\
+
+To construct the discrete form of the nonlinear advection term $\nabla\cdot(\mathbf{u}\otimes\mathbf{u})^{,n+1/2}$ while preserving conservation, a divergence-free face velocity $\mathbf{u}_f$ is required. Instead of using the classical Rhie–Chow (RC) interpolation \cite{1983_Rhie} commonly employed in finite-volume solvers, \texttt{Basilisk} adopts the BCG scheme, which incorporates both the advective fluxes and the pressure-gradient contributions when computing face velocities. A projection operator is then applied to enforce the divergence-free condition.
+
+Given the face velocity $\mathbf{u}^{,n+1/2}_f$, equation~\eqref{equ:centered-adv} is advanced using functions provided in the header file \texttt{bcg.h}, which implements the full BCG discretization. For additional details on the BCG scheme, please refer to the \texttt{bcg.h} documentation.
 
 \subsection{Diffusion}
 This step aims to compute $\mathbf{u}^{***}$.  
@@ -100,26 +102,38 @@ Here, $\mathbf{u}^{**}$ is computed implicitly, and $\mathbf{u}^{***}$ is subseq
 
 \subsection{Projection}
 
-The final step enforces the non-divergence constraint. A key challenge is managing the conversion between cell-centered and face-centered values, as velocities are stored at cell centers, accelerations are stored at cell faces, and the projection function operates on face values.  
+The final step enforces the non-divergence constraint. A key challenge in this stage is the misalignment introduced by the collocated grid arrangement: velocities are stored at cell centers, whereas pressure gradients are naturally defined on cell faces.
 
 \subsubsection{From Cell-Centered to Face-Centered: Computing $p^{n+1}$}\label{sec:centered-celltoface}  
 
-We compute the pressure $p^{n+1}$ from:  
+We compute the pressure $p^{n+1}$ from  
 \begin{gather}
     \frac{\mathbf{u}_f^{n+1} - \mathbf{u}_f^{***}}{\Delta t}
-  = -\frac{\nabla p^{n+1}}{\rho^{n+1/2}} + \mathbf{a}_f^{n+1/2}\\
-    \nabla\cdot\mathbf{u}_f^{n+1} = 0
-\end{gather}  
-which simplifies to:  
+  = -\frac{\nabla p^{n+1}}{\rho^{n+1/2}} + \mathbf{a}_f^{n+1/2},\\
+    \nabla\cdot \mathbf{u}_f^{n+1} = 0,
+\end{gather}
+which leads to the following cell-centered pressure equation, obtained by applying the projection operator to the face velocity:
 \begin{equation}
-    \nabla\left(\frac{\nabla p^{n+1}}{\rho^{n+1/2}}\right) = \nabla\left(\frac{\mathbf{u}_f^{***}}{\Delta t} + \mathbf{a}_f^{n+1/2}\right)
-\end{equation}  
-Using this relationship, the cell-centered pressure is computed with a multigrid solver applied to the face velocity:  
+    \nabla\!\left(\frac{\nabla p^{n+1}}{\rho^{n+1/2}}\right)
+    = \nabla\!\left(\frac{\mathbf{u}_f^{***}}{\Delta t}\right).
+\end{equation}
+
+The intermediate face velocity is given by  
 \begin{equation}
-    \mathbf{u}_f^{****} = \frac{\mathbf{u}^{***}[] + \mathbf{u}^{***}[-1]}{2}
-  + \Delta t \mathbf{a}_f^{n+1/2}
-\end{equation}  
-The divergence-free face velocity $\mathbf{u}_f^{n+1}$ is updated for computing the advection of tracers in the next time step.  
+    \mathbf{u}_f^{***}
+    = \frac{\mathbf{u}^{***}[] + \mathbf{u}^{***}[-1]}{2}
+    + \Delta t \mathbf{a}_f^{n+1/2}.
+\end{equation}
+
+Here we emphasize that, since $\mathbf{u}^{***}$ already includes all contributions except pressure, the face velocity $\mathbf{u}_f^{***}$ can be obtained simply by averaging adjacent cell-centered values and adding the acceleration term. No additional treatment—such as RC interpolation or the BCG construction described in section~\ref{sec:centered-advection}—is required.
+
+Finally, the divergence-free face velocity is updated as  
+\begin{equation}
+    \mathbf{u}_f^{n+1}
+    = \mathbf{u}_f^{***}
+    - \frac{\Delta t}{\rho^{n+1/2}}\, \nabla p^{n+1},
+\end{equation}
+and will be used for tracer advection in the next time step.
 
 \subsubsection{From Face-Centered to Cell-Centered: Updating $\mathbf{u}^{n+1}$}  
 

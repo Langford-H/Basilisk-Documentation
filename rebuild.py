@@ -45,10 +45,10 @@ def compile_for(texfile: Path):
     MASTER.write_text(content, encoding="utf-8")
 
     # compile pdflatex-biber-pdflatex-pdflatex
-    run(["pdflatex", "-interaction=nonstopmode", "-halt-on-error", str(MASTER)])
+    run(["pdflatex", "--shell-escape", "-interaction=nonstopmode", "-halt-on-error", str(MASTER)])
     run(["biber", MASTER.stem])
-    run(["pdflatex", "-interaction=nonstopmode", "-halt-on-error", str(MASTER)])
-    run(["pdflatex", "-interaction=nonstopmode", "-halt-on-error", str(MASTER)])
+    run(["pdflatex", "--shell-escape", "-interaction=nonstopmode", "-halt-on-error", str(MASTER)])
+    run(["pdflatex", "--shell-escape", "-interaction=nonstopmode", "-halt-on-error", str(MASTER)])
 
     pdf = MASTER.with_suffix(".pdf")
     if pdf.exists():
